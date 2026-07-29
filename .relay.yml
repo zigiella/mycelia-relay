@@ -1,0 +1,31 @@
+version: 0.1
+
+project:
+  tracker: github-issues
+  default_branch: main
+  branch_pattern: "agent/{issue}-{slug}"
+
+mycelia:
+  repository: zigiella/mycelia
+  method_ref: metodo-v0.1
+  project_note: null
+
+ownership:
+  single_writer_per_task: true
+  handoff_required: true
+  claim_timeout_hours: 24
+
+runtimes:
+  allowed: [local, cloud]
+  local_shutdown_state: paused-local
+
+checks:
+  require_pull_request: true
+  require_declared_verification: true
+  human_merge: true
+
+data_classes:
+  repository: "Puede vivir en el repo"
+  cloud-ok: "Puede procesarse en un arnés cloud aprobado"
+  local-only: "Solo ordenador autorizado"
+  synthetic-only: "Cloud recibe solo muestras sintéticas o aprobadas"

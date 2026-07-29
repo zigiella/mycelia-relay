@@ -1,0 +1,63 @@
+name: Tarea para agente
+about: Contrato durable para trabajo local, cloud o híbrido
+title: "[TASK] "
+labels: ["agent-task", "ready"]
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objetivo
+      description: Resultado que debe existir al terminar.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Criterios de aceptación
+      description: Condiciones observables de cierre.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Alcance y exclusiones
+      description: Rutas, componentes y acciones permitidas; qué queda fuera.
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Entorno de ejecución
+      options: [local, cloud, either, hybrid]
+    validations:
+      required: true
+  - type: dropdown
+    id: data
+    attributes:
+      label: Clase de datos más restrictiva
+      options: [repository, cloud-ok, local-only, synthetic-only]
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Propietaria inicial
+      placeholder: "codex-desktop, cursor-cloud, claude-local..."
+    validations:
+      required: true
+  - type: input
+    id: mycelia
+    attributes:
+      label: Notas Mycelia
+      description: Rutas o enlaces que deben visitarse; vacío si no aplica.
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verificación esperada
+      description: Tests, consultas, evaluación humana o evidencia.
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencias y bloqueos conocidos
