@@ -33,7 +33,14 @@ runtimes:
 checks:
   require_pull_request: true
   require_declared_verification: true
-  human_merge: true
+  # El par del proyecto integra lo rutinario; lo de abajo escala a la direccion.
+  merge_authority: project-par
+  escalate_to_direction:
+    - membrana          # publicar, desplegar, enviar, gastar
+    - reglas-duras      # reglas del proyecto y doctrina
+    - checks-y-permisos # CI, validadores, proteccion de ramas, secretos
+    - cambio-masivo     # barre medio repositorio
+    - duda              # ante la duda se pregunta, siempre
   # El workflow relay-check avisa; ponlo en fallo cuando el equipo lo quiera.
   workflow_strict: false
 
