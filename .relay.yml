@@ -1,28 +1,41 @@
-version: 0.1
+version: 0.2
 
 project:
   tracker: github-issues
   default_branch: main
+  # Preferencia, no ley: si el arnes de la agente impone su propio espacio de
+  # nombres, usa el suyo y declara la rama real en el HANDOFF.
   branch_pattern: "agent/{issue}-{slug}"
 
 mycelia:
-  repository: zigiella/mycelia
-  method_ref: metodo-v0.1
-  project_note: null
+  # metodo publico (se carga desde su tag sellado) e instancia privada de conocimiento
+  method_repository: zigiella/mycelia
+  method_ref: null            # null = usa METHOD.yml -> method.sealed_ref
+  knowledge_repository: null  # p.ej. zigiella/mycelia-zigiella
+  project_note: null          # p.ej. proyectos/<proyecto>/<proyecto>.md
 
 ownership:
   single_writer_per_task: true
   handoff_required: true
   claim_timeout_hours: 24
+  # Con una sola cuenta humana la propiedad es declarativa: la firma del commit
+  # es el unico rastro comprobable. Ver AGENTS.relay.md, "Propiedad y relevo".
+  claim_verifiable: false
+  agent_signature: "<nombre>@<proyecto>.local"
 
 runtimes:
   allowed: [local, cloud]
   local_shutdown_state: paused-local
+  # Si la propietaria no puede cubrir el entorno declarado: particiona y entrega
+  # su leg; bloquea solo si no es separable; nunca simula el otro entorno.
+  partition_before_block: true
 
 checks:
   require_pull_request: true
   require_declared_verification: true
   human_merge: true
+  # El workflow relay-check avisa; ponlo en fallo cuando el equipo lo quiera.
+  workflow_strict: false
 
 data_classes:
   repository: "Puede vivir en el repo"
