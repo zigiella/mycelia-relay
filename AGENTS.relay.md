@@ -88,6 +88,19 @@ Siguiente propietaria: <agente o sin asignar>
 
 El par **Comprobado con / No comprobado** es lo que de verdad sostiene el relevo: el primero es reproducible, el segundo dice a la entrante dónde mirar. No los dejes vacíos.
 
+## Quién integra
+
+**El par de cada proyecto integra el trabajo de su proyecto cuando el merge es rutinario.** No hace falta que lo pulse la dirección ni un tercero: quien conoce el terreno es quien mejor ve si el trabajo está listo, y esperar a otra persona serializa el trabajo sin comprar seguridad.
+
+**No es rutinario, y por tanto escala a la dirección:**
+
+- lo que cruza la membrana: publicar, desplegar, enviar, gastar;
+- lo que cambia reglas duras del proyecto o doctrina;
+- **lo que toca las comprobaciones o los permisos** (CI, validadores, protección de ramas, secretos): quien controla los checks controla toda la verificación futura;
+- lo que barre medio repositorio de una vez.
+
+Y una regla que vale más que la lista, porque la lista nunca está completa: **ante la duda, pregunta.** Preguntar es gratis y no es un reproche; integrar con dudas sí tiene coste, y lo paga el que viene detrás.
+
 ## Cierre
 
 El PR incluye alcance, evidencia, limitaciones, impacto sobre Mycelia y pendientes. La tarea termina al integrarse el PR o al cerrarse explícitamente el issue, no cuando una agente dice que ha acabado.

@@ -1,5 +1,11 @@
 # Changelog · Mycelia Relay
 
+## 0.3 · 2026-07-30
+
+**Quién integra**, el hueco que la auditoría del método destapó: v0.2 del método decía quién *no* integra (el verificador) y nunca decía quién *sí*. Decisión de la dirección: **el par de cada proyecto integra el trabajo de su proyecto cuando el merge es rutinario**; escalan a la dirección la membrana, las reglas duras, **lo que toca comprobaciones o permisos** (quien controla los checks controla la verificación futura), el cambio masivo, y sobre todo **la duda**: preguntar es gratis, integrar con dudas lo paga quien viene detrás.
+
+Sustituye `human_merge: true` por `merge_authority` + `escalate_to_direction` en `.relay.yml`. Descartadas por la dirección: la integración cruzada entre proyectos (daría a cada agente acceso a repos que no le tocan) y que el par de la dirección integrara el trabajo ajeno de todos los proyectos (propuesta tumbada por un adversario: creaba cuello de botella y coordinadora encubierta, y la escribía quien se beneficiaba de ella).
+
 ## 0.2 · 2026-07-30
 
 Primera versión con cicatrices: **las ocho reglas nuevas nacieron de la fricción del primer piloto real** (relevo local→cloud sobre una tarea de evaluación), no de intuiciones. Tres las trajo la agente local; cinco, la mano cloud que la relevó.
