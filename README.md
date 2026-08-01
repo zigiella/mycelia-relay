@@ -2,7 +2,7 @@
 
 Capa operativa mínima para que agentes cloud y aplicaciones de escritorio colaboren sobre un proyecto sin compartir conversación ni depender de que una máquina siga encendida.
 
-Mycelia Relay **no necesita Mycelia**. Se puede adoptar solo, en un repositorio cualquiera: lo que aporta (el issue como contrato, el bloque `HANDOFF`, las clases de datos con su motivo, los estados y `relay-check`) funciona con las reglas escritas en el `REGLAS.md` del propio repositorio. El grafo de conocimiento aparece cuando hay **varios proyectos que quieren leerse entre sí**, no antes; entonces se enchufa el bloque `knowledge` de `.relay.yml`.
+Mycelia Relay **no necesita Mycelia**. Se puede adoptar solo, en un repositorio cualquiera: lo que aporta (el issue como contrato, el bloque `HANDOFF`, el mapa de materiales con sus clases y derechos, los estados y las comprobaciones) funciona con las reglas escritas en el `REGLAS.md` del propio repositorio. El grafo de conocimiento aparece cuando hay **varios proyectos que quieren leerse entre sí**, no antes; entonces se enchufa el bloque `knowledge` de `.relay.yml`.
 
 ## Modelo
 
@@ -36,7 +36,7 @@ El orden importa: las plantillas de issue y las etiquetas **solo surten efecto d
 Y las etiquetas de estado, una vez:
 
 ```bash
-for l in ready working-local working-cloud paused-local blocked review done; do gh label create "$l" --force; done
+for l in ready working-local working-cloud paused-local blocked review done relevo; do gh label create "$l" --force; done
 ```
 
 **Paso 2 · contrato (por PR, con revisión).** Lo que sí cambia cómo se trabaja:
@@ -71,17 +71,24 @@ La clase dice **dónde puede estar** el dato:
 - `local-only`: solo se abre en el ordenador autorizado; no se copia al repo ni a un agente cloud.
 - `synthetic-only`: la nube recibe únicamente muestras sintéticas o anonimizadas aprobadas.
 
-Y el motivo dice **qué se puede derivar** de él, que es lo que de verdad pregunta quien trabaja desde la nube:
+Y los **derechos** dicen qué se puede hacer con él, **con independencia de la clase**:
 
-- `personal`: de ahí puede salir un agregado anónimo.
-- `derechos-de-terceros`: obra ajena; no sale nada derivado de su contenido, por muy anonimizado que esté.
-- `secreto-operativo`: no sale, y no se imprime.
+- `libre`: sin restricción de derivación.
+- `solo-agregado`: sale agregado o anonimizado, nunca el dato individual.
+- `no-reproducir`: se puede leer y usar; no copiar ni reproducir su contenido.
+- `no-sale`: ni se copia, ni se imprime, ni se deriva.
 
-Un mismo `local-only` con motivos distintos da permisos opuestos: por eso la clase sola no basta. Y una regla que ahorra un error caro: **lo que el proyecto publica deliberadamente no es `local-only`**; lo protegido suele ser la materia prima, no el producto.
+**Son dos ejes independientes, y ese es el punto.** Un material puede vivir legítimamente en el repositorio y ser obra ajena que se lee pero no se reproduce: `repository` + `no-reproducir`. Los derechos viajan con el dato, no con su ubicación. Y una regla que ahorra un error caro: **lo que el proyecto publica deliberadamente no es `local-only`**; lo protegido suele ser la materia prima, no el producto.
+
+Todo esto se declara en `data_map`, material a material, **con sus rutas**: una etiqueta sin ficheros no le dice a una agente cloud a qué te refieres. Y `data_map` vacío **no valida**: mientras lo esté, Relay no está protegiendo nada y `validate_config` lo dice en rojo.
 
 ## Qué se verifica solo
 
-`.github/workflows/relay-check.yml` comprueba en cada PR lo que se puede comprobar sin humano: que enlaza un issue, que la sección de evidencia no está vacía y que la clase de datos está declarada. Avisa por defecto; se endurece a fallo cuando el equipo lo quiera. Lo que no se puede automatizar (que la evidencia sea *cierta*) sigue siendo revisión humana: el workflow evita el olvido, no sustituye el criterio.
+`scripts/validate_config.py` comprueba que el proyecto **ha declarado sus materiales**: `data_map` con clase, derechos y rutas de cada uno. Falla si está vacío, si un valor no es del vocabulario o si una entrada no apunta a ficheros; avisa si una ruta no existe hoy. Un verde aquí significa que alguien ha pensado qué puede ver la nube, no que la plantilla siga entera.
+
+`.github/workflows/relay-check.yml` comprueba en cada PR de cruce lo que se puede comprobar sin humano: que enlaza un issue, que la evidencia no está vacía y que la política de datos está declarada. Avisa por defecto; se endurece a fallo cuando el equipo lo quiera.
+
+Lo que no se puede automatizar —que la evidencia sea *cierta*, que la clasificación sea *correcta*— sigue siendo criterio humano. Estas herramientas evitan el olvido; no sustituyen el juicio.
 
 ## Con o sin grafo de conocimiento
 
@@ -95,4 +102,4 @@ Relay mantiene el relevo. El proyecto produce. El conocimiento compartido, si ha
 
 ## Versión
 
-`0.2` (2026-07-30). Cambios y su origen en [`CHANGELOG.md`](CHANGELOG.md). Cada regla de esta versión nació de una fricción real del primer piloto, no de una intuición.
+`0.5` (2026-07-31). Cambios y su origen en [`CHANGELOG.md`](CHANGELOG.md). **Ninguna regla de Relay nació de una intuición**: todas salieron de fricción medida en equipos reales — un piloto de relevo local↔cloud y dos auditorías de un equipo que llegó sin marco previo.

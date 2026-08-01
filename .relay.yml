@@ -41,26 +41,39 @@ checks:
   # El workflow avisa; ponlo en fallo cuando el equipo lo quiera.
   workflow_strict: false
 
-# La clase dice DONDE puede estar el dato; el motivo dice QUE se puede derivar de
-# el. Misma clase con motivos distintos da permisos opuestos: de un local-only por
-# datos personales puede salir un agregado anonimo; de un local-only por derechos
-# de terceros no sale ni un parrafo. Y lo que el proyecto publica deliberadamente
-# NO es local-only: lo protegido suele ser la materia prima, no el producto.
+# DOS EJES INDEPENDIENTES, y ese es el punto: los derechos viajan con el dato, no
+# con la clase. Un material puede estar legitimamente en el repo (clase repository)
+# y ser obra ajena que no se puede reproducir (derechos no-reproducir). La clase
+# sola no lo dice, y por eso las dos van juntas en cada material.
+
+# DONDE puede estar el dato.
 data_classes:
   repository: "Puede vivir en el repo"
   cloud-ok: "Puede procesarse en un arnés cloud aprobado"
   local-only: "Solo ordenador autorizado"
   synthetic-only: "Cloud recibe solo muestras sintéticas o aprobadas"
 
-data_reasons:
-  personal: "Datos de personas: puede salir agregado o anonimizado"
-  derechos-de-terceros: "Obra ajena: no sale nada derivado de su contenido"
-  secreto-operativo: "Credenciales y configuracion: no sale, y no se imprime"
+# QUE se puede hacer con el, sea cual sea su clase.
+data_rights:
+  libre: "Sin restriccion de derivacion"
+  solo-agregado: "Sale agregado o anonimizado, nunca el dato individual"
+  no-reproducir: "Se puede leer y usar; no copiar ni reproducir su contenido"
+  no-sale: "Ni se copia, ni se imprime, ni se deriva"
 
-# Declara aqui lo tuyo, o en el REGLAS.md del repositorio si prefieres tenerlo
-# junto al resto de reglas duras. Ejemplo:
-#   corpus-de-terceros: {clase: local-only, motivo: derechos-de-terceros}
-#   base-de-clientes:   {clase: local-only, motivo: personal}
+# EL MAPA. Vacio no vale: mientras lo este, nadie sabe que puede ver una agente
+# cloud, y validate_config falla a proposito. Cada material con su clase, sus
+# derechos y sus RUTAS: una etiqueta sin ficheros no le dice a nadie a que te
+# refieres. Y recuerda que lo que el proyecto publica deliberadamente no es
+# local-only: lo protegido suele ser la materia prima, no el producto.
+#
+#   sinopsis-de-terceros:
+#     clase: repository          # vive en el repo, es el producto
+#     derechos: no-reproducir    # pero es obra ajena: se lee, no se copia
+#     rutas: ["data/sinopsis.json"]
+#   cache-fuente:
+#     clase: local-only
+#     derechos: solo-agregado    # trae correos: sale el agregado, no el dato
+#     rutas: ["cache/**"]
 data_map: {}
 
 # OPCIONAL Y VACIO POR DEFECTO. Relay funciona entero sin grafo de conocimiento:

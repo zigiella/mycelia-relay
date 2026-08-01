@@ -19,9 +19,9 @@ Estas reglas complementan el `AGENTS.md` del proyecto. Ante conflicto, mandan la
 - Haz cambios pequeños, reversibles y comprobables.
 - No toques rutas fuera del alcance sin ampliar el issue o dejar un handoff.
 - Publica checkpoints cuando el trabajo pueda perderse o continuar en otro entorno.
-- No escribas secretos, credenciales, rutas locales ni datos `local-only`.
+- No escribas secretos, credenciales, rutas locales ni datos `local-only`. Y antes de derivar algo de un material, mira sus **derechos** en `data_map`, no solo su clase.
 - Declara las comprobaciones reales. Un check no ejecutado se marca como no ejecutado.
-- **La clase de datos va con su motivo.** `personal` (puede salir agregado o anonimizado), `derechos-de-terceros` (no sale nada derivado del contenido) o `secreto-operativo` (no sale, y no se imprime). La clase dice dónde puede estar el dato; el motivo dice qué puedes derivar de él, y es lo que de verdad necesita saber quien trabaja desde la nube.
+- **Clase y derechos son dos ejes, y los derechos viajan con el dato.** La clase dice **dónde** puede estar (`repository`, `cloud-ok`, `local-only`, `synthetic-only`); los derechos dicen **qué puedes hacer con él** (`libre`, `solo-agregado`, `no-reproducir`, `no-sale`), y valen igual aunque la clase no restrinja nada. Un material puede vivir legítimamente en el repositorio y ser obra ajena que se lee pero no se reproduce: eso es `repository` + `no-reproducir`, y si tu esquema no lo admite, el esquema está mal. Cada material, con sus rutas, está en `data_map` de `.relay.yml`.
 - **Lo que el proyecto publica deliberadamente no es `local-only`.** Si algo ya está en la web o en un repositorio público, protegerlo como local es una ficción que obliga a despublicar para cumplirla. Lo protegido suele ser la materia prima, no el producto.
 - **Ampliar el alcance se declara, no se cuela.** Si descubres que hace falta algo que el issue no pedía, hazlo si es reversible y dilo en la entrega como ampliación; nunca en silencio.
 

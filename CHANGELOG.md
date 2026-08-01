@@ -1,5 +1,17 @@
 # Changelog · Mycelia Relay
 
+## 0.5 · 2026-07-31
+
+Cuatro cambios de la **segunda auditoría de Clara**, hecha ya con 0.4.1 instalado y funcionando. El primero es el más grave que ha tenido Relay.
+
+**`data_map` vacío ya no valida.** `validate_config` comprobaba que existieran las claves `data_classes` y `data_rights`, que son **el vocabulario que la propia plantilla trae de fábrica**: validaba que no hubieras roto el fichero, disfrazado de que habías declarado tus reglas. Un equipo podía instalar Relay, ver «Configuración Relay válida» y dejar entrar a una agente cloud sin una sola regla escrita. Como dice Clara, es la lección del piloto con otra cara: el andamiaje que llega tarde no sirve, y **el que llega vacío tampoco, pero además parece que sí**. Ahora el validador lee el YAML de verdad, falla con el mapa vacío, exige clase, derechos y rutas por material, rechaza valores fuera del vocabulario, avisa de rutas que no existen, y si no puede verificar (falta PyYAML) **falla en vez de fingir**: un «no sé» no es un verde.
+
+**Los derechos viajan con el dato, no con la clase.** Eran un eje solo: `motivo` calificaba una clase restrictiva. Pero el material de sinopsis de convoca es `repository` legítimamente **y** obra ajena: se puede leer y no reproducir, y el esquema no tenía sitio para decirlo (Clara lo coló poniendo motivo en una clase sin restricción, que es la señal de que el modelo estaba mal). Ahora son dos ejes independientes: `data_classes` dice **dónde** puede estar, `data_rights` dice **qué se puede hacer** (`libre`, `solo-agregado`, `no-reproducir`, `no-sale`), y valen aunque la clase no restrinja.
+
+**`data_map` apunta a ficheros reales.** Cada material declara sus `rutas`. Una etiqueta como «corpus-de-terceros» no le dice a una agente cloud qué fichero es; el validador lo exige y avisa si la ruta no existe.
+
+**Las plantillas dejan de nombrar el grafo.** 0.4.1 hizo Mycelia opcional en la configuración y el contrato, pero la plantilla de issue seguía pidiendo «Notas Mycelia» y la de PR, «Impacto sobre Mycelia». Segunda vez que el cambio llega a la doctrina y no a los artefactos que los equipos copian: la lección propia es mirar siempre lo que se copia, no lo que se lee.
+
 ## 0.4.1 · 2026-07-31
 
 Corrige el defecto de `v0.4`: **el cambio principal no llegó a `.relay.yml`**, que es justo el fichero que los equipos copian. Seguía en `version: 0.2` (mal desde 0.3) y encabezado por un bloque `mycelia:` con `method_repository`, o sea exactamente la dependencia visible que 0.4 venía a quitar. El README y el contrato sí decían lo correcto; la plantilla no.
