@@ -9,9 +9,9 @@ Estas reglas complementan el `AGENTS.md` del proyecto. Ante conflicto, mandan la
 3. **Verifica el estado de partida contra el repositorio.** Una tarea puede estar hecha en parte: es lo normal al instalar Relay sobre un proyecto en marcha. Si el issue declara cobertura previa, compruébala en el código antes de escribir; si difiere, corrige el issue **antes** de trabajar, no después. Rehacer trabajo existente, o sustituirlo por otra versión creyendo que partías de cero, es el fallo más caro de esta fase.
 4. Confirma que no existe otra escritora activa sobre la misma tarea o rama.
 5. Crea o recupera la rama que fije `.relay.yml`. Si tu arnés impone su propio espacio de nombres y no puedes cumplir el patrón, usa el suyo y **declara la rama real en el relevo**: el patrón existe para que la rama se encuentre, no es una ley que justifique no entregar.
-6. Lee únicamente las notas de Mycelia enlazadas desde el issue.
+6. Si el proyecto usa un grafo de conocimiento, lee **solo** las notas enlazadas desde el issue. Si no lo usa, tus reglas duras y clases de datos viven en el `REGLAS.md` de este repositorio: Relay no necesita grafo.
 
-Una instrucción recibida por chat que no esté reflejada en el issue todavía no cambia el contrato durable.
+**El issue es el contrato cuando el trabajo cruza entornos o cambia de manos.** Ahí una instrucción de chat no reflejada en el issue todavía no cambia nada: una agente cloud no oye el chat, y el issue es la única superficie que las dos partes leen. Si una sola agente hace la tarea entera en un entorno, la dirección manda por su canal y el issue se abre cuando hay algo que relevar o algo que recordar.
 
 ## Durante el trabajo
 
@@ -21,6 +21,8 @@ Una instrucción recibida por chat que no esté reflejada en el issue todavía n
 - Publica checkpoints cuando el trabajo pueda perderse o continuar en otro entorno.
 - No escribas secretos, credenciales, rutas locales ni datos `local-only`.
 - Declara las comprobaciones reales. Un check no ejecutado se marca como no ejecutado.
+- **La clase de datos va con su motivo.** `personal` (puede salir agregado o anonimizado), `derechos-de-terceros` (no sale nada derivado del contenido) o `secreto-operativo` (no sale, y no se imprime). La clase dice dónde puede estar el dato; el motivo dice qué puedes derivar de él, y es lo que de verdad necesita saber quien trabaja desde la nube.
+- **Lo que el proyecto publica deliberadamente no es `local-only`.** Si algo ya está en la web o en un repositorio público, protegerlo como local es una ficción que obliga a despublicar para cumplirla. Lo protegido suele ser la materia prima, no el producto.
 - **Ampliar el alcance se declara, no se cuela.** Si descubres que hace falta algo que el issue no pedía, hazlo si es reversible y dilo en la entrega como ampliación; nunca en silencio.
 
 ## Cuando no puedes cumplir el entorno declarado
