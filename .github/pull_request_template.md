@@ -19,14 +19,14 @@ Closes #
 
 ## Política de datos
 
-- Clase utilizada: repository | cloud-ok | local-only | synthetic-only
-- Confirmo que no se añadieron datos locales, secretos o identificadores prohibidos: [ ]
+- Material tocado (nombre en `data_map`):
+- Clase y derechos: repository | cloud-ok | local-only | synthetic-only · libre | solo-agregado | no-reproducir | no-sale
+- Confirmo que respeté los derechos del material: no salió nada que no debiera salir [ ]
 
-## Impacto sobre Mycelia
+## Conocimiento reusable
 
-- [ ] No deja conocimiento reusable.
-- [ ] Actualiza una nota existente: 
-- [ ] Propone una nota nueva: 
+- [ ] Nada que sobreviva a esta tarea.
+- [ ] Deja una lección o decisión que merece sobrevivir (dónde queda escrita): 
 
 ## Handoff o pendientes
 
