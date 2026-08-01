@@ -1,5 +1,13 @@
 # Changelog · Mycelia Relay
 
+## 0.4.1 · 2026-07-31
+
+Corrige el defecto de `v0.4`: **el cambio principal no llegó a `.relay.yml`**, que es justo el fichero que los equipos copian. Seguía en `version: 0.2` (mal desde 0.3) y encabezado por un bloque `mycelia:` con `method_repository`, o sea exactamente la dependencia visible que 0.4 venía a quitar. El README y el contrato sí decían lo correcto; la plantilla no.
+
+Ahora `.relay.yml` no menciona ningún método de conocimiento hasta el final, en un bloque `knowledge:` **opcional y vacío por defecto**, y trae `data_map` para declarar clase y motivo de cada material del proyecto.
+
+La cicatriz que deja: se selló `v0.4` sin abrir el artefacto sellado. El tag no se reescribe; se supera. Verificar antes de sellar, no después.
+
 ## 0.4 · 2026-07-31
 
 **Relay se sostiene solo.** Cuatro cambios de una auditoría de Clara (mp1-escritores), el primer equipo que llegó sin marco previo y por eso vio costuras que un equipo con reglas propias ya tapa sin darse cuenta.
