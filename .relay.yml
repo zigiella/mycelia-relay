@@ -1,4 +1,4 @@
-version: 0.2
+version: 0.4
 
 project:
   tracker: github-issues
@@ -6,13 +6,6 @@ project:
   # Preferencia, no ley: si el arnes de la agente impone su propio espacio de
   # nombres, usa el suyo y declara la rama real en el HANDOFF.
   branch_pattern: "agent/{issue}-{slug}"
-
-mycelia:
-  # metodo publico (se carga desde su tag sellado) e instancia privada de conocimiento
-  method_repository: zigiella/mycelia
-  method_ref: null            # null = usa METHOD.yml -> method.sealed_ref
-  knowledge_repository: null  # p.ej. zigiella/mycelia-zigiella
-  project_note: null          # p.ej. proyectos/<proyecto>/<proyecto>.md
 
 ownership:
   single_writer_per_task: true
@@ -41,13 +34,18 @@ checks:
     - checks-y-permisos # CI, validadores, proteccion de ramas, secretos
     - cambio-masivo     # barre medio repositorio
     - duda              # ante la duda se pregunta, siempre
-  # El workflow relay-check avisa; ponlo en fallo cuando el equipo lo quiera.
+  # relay-check solo mira los PR que cruzan entornos o cambian de manos; un aviso
+  # que salta siempre se deja de leer.
+  only_cross_environment: true
+  cross_environment_label: "relevo"
+  # El workflow avisa; ponlo en fallo cuando el equipo lo quiera.
   workflow_strict: false
 
 # La clase dice DONDE puede estar el dato; el motivo dice QUE se puede derivar de
 # el. Misma clase con motivos distintos da permisos opuestos: de un local-only por
 # datos personales puede salir un agregado anonimo; de un local-only por derechos
-# de terceros no sale ni un parrafo.
+# de terceros no sale ni un parrafo. Y lo que el proyecto publica deliberadamente
+# NO es local-only: lo protegido suele ser la materia prima, no el producto.
 data_classes:
   repository: "Puede vivir en el repo"
   cloud-ok: "Puede procesarse en un arnés cloud aprobado"
@@ -59,8 +57,17 @@ data_reasons:
   derechos-de-terceros: "Obra ajena: no sale nada derivado de su contenido"
   secreto-operativo: "Credenciales y configuracion: no sale, y no se imprime"
 
-checks_scope:
-  # relay-check solo mira los PR que cruzan entornos o cambian de manos; un aviso
-  # que salta siempre se deja de leer.
-  only_cross_environment: true
-  cross_environment_label: "relevo"
+# Declara aqui lo tuyo, o en el REGLAS.md del repositorio si prefieres tenerlo
+# junto al resto de reglas duras. Ejemplo:
+#   corpus-de-terceros: {clase: local-only, motivo: derechos-de-terceros}
+#   base-de-clientes:   {clase: local-only, motivo: personal}
+data_map: {}
+
+# OPCIONAL Y VACIO POR DEFECTO. Relay funciona entero sin grafo de conocimiento:
+# las reglas duras y las clases de datos viven en el REGLAS.md de este mismo
+# repositorio. El grafo aparece cuando hay VARIOS proyectos que quieren leerse
+# entre si, no antes. Si algun dia lo hay, rellena estos tres campos.
+knowledge:
+  method_repository: null   # metodo de conocimiento, si se usa alguno
+  repository: null          # instancia de conocimiento
+  project_note: null        # nota raiz de este proyecto dentro de esa instancia
