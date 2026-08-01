@@ -7,8 +7,12 @@ Mycelia Relay **no necesita Mycelia**. Se puede adoptar solo, en un repositorio 
 ## Modelo
 
 ```text
-Mycelia                 repositorio anfitrión             agentes
-conocimiento  <------>  issue -> rama -> PR  <------>  local / cloud
+repositorio anfitrión                       agentes
+issue -> rama -> PR   <------------>   local / cloud
+     (reglas en REGLAS.md)
+
+    ...y si hay varios proyectos que quieren leerse entre sí,
+    un grafo de conocimiento opcional colgando del issue.
 ```
 
 - El **issue** es el contrato y el estado de la tarea.
@@ -79,11 +83,15 @@ Un mismo `local-only` con motivos distintos da permisos opuestos: por eso la cla
 
 `.github/workflows/relay-check.yml` comprueba en cada PR lo que se puede comprobar sin humano: que enlaza un issue, que la sección de evidencia no está vacía y que la clase de datos está declarada. Avisa por defecto; se endurece a fallo cuando el equipo lo quiera. Lo que no se puede automatizar (que la evidencia sea *cierta*) sigue siendo revisión humana: el workflow evita el olvido, no sustituye el criterio.
 
-## Relación con Mycelia
+## Con o sin grafo de conocimiento
 
-Una tarea puede consumir notas de Mycelia y devolver conocimiento reusable. Los logs, ramas, checkpoints y pendientes permanecen en el repositorio anfitrión. Las agentes se firman con identidad propia (`<nombre>@<proyecto>.local`) y se registran en el roster de la instancia; el método lo detalla en `metodo/nucleo/identidad-y-nombres.md`.
+**Sin grafo** (lo normal al empezar): las reglas duras y las clases de datos del proyecto viven en su `REGLAS.md`, el issue enlaza lo que haga falta del propio repositorio, y el bloque `knowledge` de `.relay.yml` se queda vacío. Relay funciona entero.
 
-Mycelia recuerda. Relay mantiene el relevo. El proyecto produce.
+**Con grafo**, cuando hay varios proyectos que quieren leerse entre sí: una tarea puede consumir notas enlazadas desde el issue y devolver conocimiento reusable. Los logs, ramas, checkpoints y pendientes se quedan en el repositorio anfitrión de todas formas.
+
+En ambos casos, las agentes se firman con identidad propia (`<nombre>@<proyecto>.local`): el dominio nombra el proyecto, no la tecnología, porque un nombre sobrevive al cambio de modelo.
+
+Relay mantiene el relevo. El proyecto produce. El conocimiento compartido, si hace falta, viene después.
 
 ## Versión
 
