@@ -1,5 +1,17 @@
 # Changelog · Mycelia Relay
 
+## 0.4 · 2026-07-31
+
+**Relay se sostiene solo.** Cuatro cambios de una auditoría de Clara (mp1-escritores), el primer equipo que llegó sin marco previo y por eso vio costuras que un equipo con reglas propias ya tapa sin darse cuenta.
+
+**Sin dependencia de Mycelia** (decisión de la dirección, confirmada por el hallazgo de Clara). El contrato asumía el grafo: `.relay.yml` pedía repositorio de conocimiento y nota de proyecto, y el contrato mandaba leer las notas enlazadas desde el issue. La dependencia era **incidental, no esencial**: lo que Relay aporta funciona con las reglas escritas en el `REGLAS.md` del propio repositorio. El bloque `knowledge` pasa a opcional y el grafo se enchufa cuando hay varios proyectos que quieren leerse entre sí. Sin esto, un equipo con un problema urgente y acotado tenía que adoptar dos marcos a la vez, y la mitad diría que no a los dos.
+
+**El issue es el contrato cuando el trabajo cruza entornos o cambia de manos.** La regla estaba bien y su alcance no: escrita para todo el trabajo, obligaba a abrir un issue por cada observación de la dirección, que es el cuello de botella que el método quiere evitar. La razón real de la regla es que **una agente cloud no oye el chat**; fuera de ese caso, la dirección manda por su canal.
+
+**La clase de datos va con su motivo.** La clase dice dónde puede estar el dato; el motivo (`personal`, `derechos-de-terceros`, `secreto-operativo`) dice qué se puede derivar de él. Un mismo `local-only` puede ser un corpus con datos personales (de ahí sale un agregado anónimo) u obra ajena (de ahí no sale nada), y hasta ahora se etiquetaban igual. Se añade la regla que evita el error inverso: **lo que el proyecto publica deliberadamente no es `local-only`**; lo protegido suele ser la materia prima, no el producto.
+
+**El bootstrap deja de prometer lo que no cumple.** `relay-check` corría en todos los PR y avisaba en todos los de un proyecto en marcha; ahora solo mira los marcados como cruce de entornos. Un aviso que salta siempre se deja de leer.
+
 ## 0.3 · 2026-07-30
 
 **Quién integra**, el hueco que la auditoría del método destapó: v0.2 del método decía quién *no* integra (el verificador) y nunca decía quién *sí*. Decisión de la dirección: **el par de cada proyecto integra el trabajo de su proyecto cuando el merge es rutinario**; escalan a la dirección la membrana, las reglas duras, **lo que toca comprobaciones o permisos** (quien controla los checks controla la verificación futura), el cambio masivo, y sobre todo **la duda**: preguntar es gratis, integrar con dudas lo paga quien viene detrás.

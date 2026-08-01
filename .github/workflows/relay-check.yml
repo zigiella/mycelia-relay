@@ -22,7 +22,16 @@ jobs:
         run: |
           BODY=$(jq -r '.pull_request.body // ""' "$GITHUB_EVENT_PATH")
           DRAFT=$(jq -r '.pull_request.draft' "$GITHUB_EVENT_PATH")
+          LABELS=$(jq -r '[.pull_request.labels[].name] | join(",")' "$GITHUB_EVENT_PATH")
           if [ "$DRAFT" = "true" ]; then echo "PR en borrador: no se comprueba todavia."; exit 0; fi
+
+          # Solo se comprueban los PR que cruzan entornos o cambian de manos: un
+          # aviso que salta en todos los PR se deja de leer, y el dia que importa
+          # nadie lo mira. Pon la etiqueta 'relevo' cuando la tarea cruce.
+          case ",$LABELS," in
+            *,relevo,*|*,working-cloud,*|*,paused-local,*) ;;
+            *) echo "PR sin cruce de entornos: fuera del alcance de relay-check."; exit 0 ;;
+          esac
 
           avisos=0
           aviso() { echo "::warning::$1"; avisos=$((avisos+1)); }
