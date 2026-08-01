@@ -12,6 +12,7 @@ Uso: python scripts/validate_config.py [ruta]
 """
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -47,6 +48,16 @@ def main() -> int:
     if fallos:
         print("Configuracion incompleta:\n  - " + "\n  - ".join(fallos))
         return 1
+
+    # La version se ha quedado atras tres veces seguidas al preparar releases:
+    # deja de ser mala suerte y pasa a ser comprobacion.
+    cambios = ruta.parent / "CHANGELOG.md"
+    if cambios.exists():
+        cabecera = re.search(r"^##\s+([0-9]+\.[0-9.]*[0-9])", cambios.read_text(encoding="utf-8"), re.M)
+        if cabecera and str(cfg.get("version")) != cabecera.group(1):
+            fallos.append(
+                f"version del fichero ({cfg.get('version')}) distinta de la ultima del CHANGELOG "
+                f"({cabecera.group(1)}): una de las dos miente")
 
     if not cfg.get("project", {}).get("tracker"):
         fallos.append("project.tracker sin declarar: no se sabe donde viven las tareas")
