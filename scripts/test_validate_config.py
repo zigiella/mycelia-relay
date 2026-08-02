@@ -108,12 +108,21 @@ CASOS = [
         dict(config=BASE.replace(DERECHOS, "")), 1, "data_rights",
     ),
     (
-        "version que no cuadra con el CHANGELOG cae",
-        dict(config=BASE, changelog="# Changelog\n\n## 0.7 · 2026-01-01\n\nAlgo.\n"), 1, "CHANGELOG",
+        "version que no cuadra con el CHANGELOG de Relay cae",
+        dict(config=BASE, changelog="# Changelog - Mycelia Relay\n\n## 0.7 - 2026-01-01\n\nAlgo.\n"),
+        1, "CHANGELOG",
     ),
     (
-        "version que cuadra con el CHANGELOG pasa",
-        dict(config=BASE, changelog="# Changelog\n\n## 0.6 · 2026-01-01\n\nAlgo.\n"), 0, "valida",
+        "version que cuadra con el CHANGELOG de Relay pasa",
+        dict(config=BASE, changelog="# Changelog - Mycelia Relay\n\n## 0.6 - 2026-01-01\n\nAlgo.\n"),
+        0, "valida",
+    ),
+    (
+        # La guarda es nuestra y el rojo iba a ser suyo: casi todo repositorio
+        # anfitrion tiene su propio CHANGELOG.md en la raiz, junto al .relay.yml.
+        "el CHANGELOG del proyecto anfitrion no dispara la guarda de version",
+        dict(config=BASE, changelog="# Changelog de datapoble\n\n## 2.3.1 - 2026-07-20\n\nAlgo suyo.\n"),
+        0, "valida",
     ),
     (
         "ruta declarada que no existe avisa, pero no tumba",

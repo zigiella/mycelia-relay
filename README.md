@@ -110,4 +110,4 @@ Relay mantiene el relevo. El proyecto produce. El conocimiento compartido, si ha
 
 ## Versión
 
-`0.6` (2026-08-02). Cambios y su origen en [`CHANGELOG.md`](CHANGELOG.md). **Ninguna regla de Relay nació de una intuición**: todas salieron de fricción medida en equipos reales — un piloto de relevo local↔cloud, dos auditorías de un equipo que llegó sin marco previo y la adopción de un equipo que llegó desde otro marco con equipo ya montado.
+`0.6.1` (2026-08-02). Cambios y su origen en [`CHANGELOG.md`](CHANGELOG.md). **Ninguna regla de Relay nació de una intuición**: todas salieron de fricción medida en equipos reales — un piloto de relevo local↔cloud, dos auditorías de un equipo que llegó sin marco previo y la adopción de un equipo que llegó desde otro marco con equipo ya montado.
