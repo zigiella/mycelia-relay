@@ -39,7 +39,7 @@ scripts/validate_config.py
 Y las etiquetas de estado, una vez:
 
 ```bash
-for l in ready working-local working-cloud paused-local blocked review done relevo; do gh label create "$l" --force; done
+for l in agent-task ready working-local working-cloud paused-local blocked review done relevo; do gh label create "$l" --force; done
 ```
 
 **Paso 2 · contrato (por PR, con revisión).** Lo que sí cambia cómo se trabaja:

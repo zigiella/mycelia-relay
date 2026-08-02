@@ -87,6 +87,13 @@ data_rights:
 #     clase: local-only
 #     derechos: solo-agregado    # trae correos: sale el agregado, no el dato
 #     rutas: ["cache/**"]
+#   credencial-delegada:
+#     clase: cloud-ok            # puede vivir en el entorno de una agente cloud...
+#     derechos: no-sale          # ...pero no se imprime, ni se pega, ni se deriva
+#     rutas: [".env.local"]
+#     # SOLO si cumple las dos: daño maximo pequeño y acotado (un proxy de solo
+#     # lectura, un bot que avisa) y rotable en minutos. Una clave que gasta,
+#     # despliega o escribe es local-only siempre. Caso real: convoca, 01-08-2026.
 data_map: {}
 
 # OPCIONAL Y VACIO POR DEFECTO. Relay funciona entero sin grafo de conocimiento:
