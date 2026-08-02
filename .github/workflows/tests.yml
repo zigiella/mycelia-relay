@@ -1,12 +1,18 @@
 name: Tests
 
-# CI del PROPIO Relay, no parte del andamiaje que se instala en un proyecto. Un equipo
-# que adopta Relay copia .github/ISSUE_TEMPLATE/, pull_request_template.md, relay-check.yml
-# y scripts/validate_config.py; este fichero se queda aqui.
-#
 # Existe por la regla de datapoble: una guarda que no has visto caer no es una guarda.
 # Hasta 0.5 nuestro validador daba verde con el data_map vacio y nadie lo habia visto
 # fallar nunca. Ahora cada guarda se prueba en negativo en cada push.
+#
+# OPCIONAL PERO PORTABLE. Hasta 0.6.1 esta cabecera decia "este fichero se queda aqui",
+# y era verdad por un defecto: test_validate_config fallaba siempre en un anfitrion
+# porque comprobaba que `.relay.yml` estuviera en rojo, y alli esa es la configuracion
+# real del proyecto. Lo arreglo datapoble al ser el primer anfitrion que lo corrio.
+# Ahora si viaja: un equipo que copie scripts/validate_config.py puede copiar tambien
+# scripts/test_validate_config.py y este workflow, y tendra la prueba de que SU copia
+# hace lo que dice. El caso que solo aplica aqui se declara "skip" en voz alta.
+#
+# Si copias este workflow, copia tambien el script: sin el, la CI queda en rojo.
 
 on:
   push:

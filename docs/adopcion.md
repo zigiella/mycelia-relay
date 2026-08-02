@@ -30,12 +30,12 @@ scripts/validate_config.py
 Y las etiquetas de estado, una vez:
 
 ```bash
-for l in ready working-local working-cloud paused-local blocked review done relevo; do gh label create "$l" --force; done
+for l in agent-task ready working-local working-cloud paused-local blocked review done relevo; do gh label create "$l" --force; done
 ```
 
 Es casi inerte, con una excepción honesta: `relay-check` empieza a correr en los PR. Desde 0.4 solo mira los que llevan etiqueta de cruce de entornos, así que en el resto sale de puntillas.
 
-`scripts/test_validate_config.py` y `.github/workflows/tests.yml` son la CI del propio Relay y **no hace falta copiarlos**. Si los copias, tendrás la prueba de que tu copia del validador hace lo que dice — que es más de lo que tuvimos nosotros durante cinco versiones.
+`scripts/test_validate_config.py` y `.github/workflows/tests.yml` son **opcionales pero portables**: si copias el validador, cópialos y tendrás la prueba de que tu copia hace lo que dice — que es más de lo que tuvimos nosotros durante cinco versiones. El caso que solo tiene sentido en el repositorio del método se declara `skip` en voz alta. Copia el workflow **solo** si copias también el script: sin él, tu CI queda en rojo.
 
 ## Paso 2 · Contrato, por PR y con revisión
 

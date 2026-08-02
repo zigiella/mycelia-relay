@@ -125,6 +125,14 @@ CASOS = [
         0, "valida",
     ),
     (
+        # Lo que escribe cualquier equipo en SU changelog el dia que adopta Relay.
+        # Con el criterio de "buscar en el cuerpo", el falso rojo volvia por aqui.
+        "un anfitrion que MENCIONA Relay en su changelog tampoco la dispara",
+        dict(config=BASE,
+             changelog="# Changelog de convoca\n\n## 2.2 - 2026-08-02\n\nAdoptado Mycelia Relay 0.6.1.\n"),
+        0, "valida",
+    ),
+    (
         "ruta declarada que no existe avisa, pero no tumba",
         dict(config=BASE, ficheros=()), 0, "aviso",
     ),
@@ -142,14 +150,19 @@ CASOS = [
 def es_repo_de_relay() -> bool:
     """True solo dentro del repositorio del metodo, no en un proyecto que lo adopta.
 
-    Se mira el CHANGELOG: el de Relay declara versiones de Relay. Un anfitrion o no
-    tiene, o tiene el suyo (y ese fue justo el falso rojo que 0.6.1 corrigio).
+    El criterio NO se reimplementa aqui: se importa del validador, que es donde vive
+    desde 0.6.2. La primera version de esta funcion buscaba "Mycelia Relay" en los
+    primeros 2000 caracteres del CHANGELOG, y eso es exactamente lo que un equipo
+    escribe en SU changelog el dia que adopta Relay -- con lo que el falso rojo volvia
+    por la puerta de al lado. Dos copias del mismo criterio divergen, y esta decide si
+    una guarda corre.
     """
     ch = RAIZ / "CHANGELOG.md"
     if not ch.exists():
         return False
-    cabeza = ch.read_text(encoding="utf-8")[:2000]
-    return "Mycelia Relay" in cabeza or "mycelia-relay" in cabeza
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from validate_config import es_changelog_de_relay
+    return es_changelog_de_relay(ch.read_text(encoding="utf-8"))
 
 
 def main() -> int:
@@ -192,7 +205,6 @@ def main() -> int:
     else:
         print("skip | plantilla en rojo: solo aplica en el repo de Relay, no en un anfitrion")
 
-    total = total
     print(f"\n{total - fallos}/{total} guardas comprobadas.")
     if fallos:
         print("Hay guardas que no hacen lo que dicen.")

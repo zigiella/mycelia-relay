@@ -20,6 +20,21 @@ CLASES = {"repository", "cloud-ok", "local-only", "synthetic-only"}
 DERECHOS = {"libre", "solo-agregado", "no-reproducir", "no-publicar", "no-sale"}
 
 
+def es_changelog_de_relay(texto: str) -> bool:
+    """True si este CHANGELOG.md es el de Relay y no el del proyecto anfitrion.
+
+    Se mira SOLO LA LINEA DE TITULO (H1), no el cuerpo: el H1 de un anfitrion es
+    "# Changelog de datapoble", y el nuestro nombra a Relay. Buscarlo en el cuerpo
+    no vale, porque "Adoptado Mycelia Relay 0.6.1" es literalmente lo que un equipo
+    escribe en SU changelog el dia que adopta el metodo.
+
+    Vive aqui y la importa test_validate_config: dos copias del mismo criterio
+    acaban divergiendo, y esta decide si una guarda corre o se salta.
+    """
+    titulo = re.search(r"^#\s+(.+)$", texto, re.M)
+    return titulo is not None and "relay" in titulo.group(1).lower()
+
+
 def main() -> int:
     ruta = Path(sys.argv[1] if len(sys.argv) > 1 else ".relay.yml")
     if not ruta.exists():
@@ -61,10 +76,8 @@ def main() -> int:
     cambios = ruta.parent / "CHANGELOG.md"
     if cambios.exists():
         texto = cambios.read_text(encoding="utf-8")
-        titulo = re.search(r"^#\s+(.+)$", texto, re.M)
-        es_de_relay = titulo is not None and "relay" in titulo.group(1).lower()
         cabecera = re.search(r"^##\s+([0-9]+\.[0-9.]*[0-9])", texto, re.M)
-        if es_de_relay and cabecera and str(cfg.get("version")) != cabecera.group(1):
+        if es_changelog_de_relay(texto) and cabecera and str(cfg.get("version")) != cabecera.group(1):
             fallos.append(
                 f"version del fichero ({cfg.get('version')}) distinta de la ultima del CHANGELOG "
                 f"({cabecera.group(1)}): una de las dos miente")
