@@ -1,5 +1,30 @@
 # Changelog · Mycelia Relay
 
+## 0.6.2 · 2026-08-02
+
+**Los dos equipos corrieron 0.6.1 el mismo día y devolvieron un defecto cada uno.** Los dos son míos y los dos son la misma familia: escribir una guarda desde el punto de vista del repositorio del método y romperla en el anfitrión.
+
+**`test_validate_config.py` no era portable** (datapoble). El caso que comprueba «la plantilla de este repositorio sigue en rojo» apunta a `.relay.yml`, que **en un anfitrión es la configuración real del proyecto y está legítimamente llena**: allí fallaba siempre. Y lo peor no es el defecto: el mensaje de migración a 0.6.1 recomendaba copiar ese fichero, o sea que se entregó un rojo permanente en el mismo texto que explicaba que un rojo permanente se deja de leer. Ahora el caso solo corre dentro del repositorio de Relay y fuera se declara `skip` en voz alta.
+
+Es la otra mitad de la enmienda 5: **una guarda se prueba en negativo y se prueba donde va a correr.** La de 0.6.1 se encontró leyendo el código; ésta, ejecutándola en un anfitrión — que es la única forma de encontrarla.
+
+*Ajuste de la custodia:* la detección propuesta buscaba «Mycelia Relay» en los primeros 2000 caracteres del CHANGELOG, y eso es **literalmente lo que escribe un equipo en su propio changelog el día que adopta Relay** («Adoptado Mycelia Relay 0.6.1»): el falso rojo volvía por la puerta de al lado. Reproducido. El criterio pasa a ser la **línea de título**, el mismo que usa el validador desde 0.6.1, y vive **en un solo sitio** —`es_changelog_de_relay()` en `validate_config.py`, que el test importa—: dos copias de la misma regla divergen, y ésta decide si una guarda corre.
+
+**La cabecera de `tests.yml` decía lo contrario que el mensaje de migración** (datapoble, sin código). Decía «este fichero se queda aquí» y el mensaje recomendaba copiarlo. La contradicción se resuelve a favor del mensaje, porque **la cabecera era verdad solo por el defecto que este mismo cambio corrige**: ahora el test sí viaja. Con el aviso que faltaba: copiar el workflow sin copiar el script deja la CI en rojo.
+
+**El bootstrap no crea la etiqueta `agent-task`** (convoca). La plantilla de issue la declara en `labels:` y la línea de `gh label create` no la incluía: **el primer issue real de cualquier adopción falla al etiquetarse**. Es la cicatriz de 0.2 con otra cara — arreglamos el mecanismo (las etiquetas no existen hasta que alguien las da de alta) y dejamos la lista incompleta. Corregida en el README y en la guía de adopción, que la tenían las dos.
+
+**La credencial delegada, tercer ejemplo del `data_map`** (convoca). Una agente cloud necesitó el token de un proxy de solo lectura y el de un bot que solo avisa; el mapa decía `local-only` y la realidad decía otra cosa, y **lo señaló la propia agente**. Lo notable es que **la solución no tocó el método**: `cloud-ok` (dónde puede estar) + `no-sale` (qué se hace con ella) ya lo expresaba, porque los dos ejes son independientes. Que un caso real caiga dentro del esquema sin ensancharlo es la mejor noticia que puede dar una adopción.
+
+*Ajustes de la dirección,* porque el ejemplo viaja en la plantilla que copian todos los equipos y va de credenciales:
+
+- **«Rotada al menos una vez, con el procedimiento escrito», no «rotable».** Es la enmienda 5 aplicada aquí: una rotación que nunca has ejecutado no es una rotación.
+- **Acuñada para ese entorno**, propia y revocable por separado, nunca copia de una que comparten personas u otros sistemas. Los entornos cloud no suelen tener bóveda y **quien usa el entorno puede leer sus valores**: eso no invalida la regla, la afila.
+- **Fuera `rutas: [".env.local"]`.** En un arnés cloud la credencial es una variable de entorno, no un fichero del árbol, y apuntar el mapa a una ruta invita a crear ese fichero dentro del repositorio. Dicho además en voz alta: `cloud-ok` significa «ese arnés puede usarla», **no** «puede vivir en el repo».
+- Y la pregunta previa que ahorra el caso entero: **¿tiene que existir ahí esa credencial?** Muchos arneses inyectan las suyas por proxy y entonces no se guarda ninguna.
+
+**Dos casos nuevos**, [`convoca-primera-agente-cloud.md`](docs/casos/convoca-primera-agente-cloud.md) y el de datapoble en 0.6. Del de convoca merece subrayarse algo que no pedía entrar en el método: el segundo PR de su agente cloud no traía código, traía **su jaula medida** y una objeción correcta al diseño del issue —pedía junto juzgar un libro (criterio) y comprobar que un enlace abre (mecánico, necesita red)—, que es particionar antes que bloquear, por iniciativa propia y mejor argumentado que nuestra regla.
+
 ## 0.6.1 · 2026-08-02
 
 **La guarda de versión era nuestra y el rojo iba a ser suyo.** La comprobación que 0.5 añadió —que `.relay.yml` y el CHANGELOG digan la misma versión— no miraba **de quién** era el CHANGELOG. En cualquier repositorio anfitrión con su propio `CHANGELOG.md` en la raíz, que son casi todos, comparaba la versión de Relay contra la del proyecto y fallaba: `version del fichero (0.6) distinta de la ultima del CHANGELOG (2.3.1)`. Un rojo por algo que no es un fallo, en el primer comando que ejecuta un equipo al adoptar. Ahora solo se dispara si el CHANGELOG es de Relay.

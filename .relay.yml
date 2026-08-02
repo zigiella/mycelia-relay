@@ -1,4 +1,4 @@
-version: 0.6.1
+version: 0.6.2
 
 project:
   tracker: github-issues
@@ -88,12 +88,25 @@ data_rights:
 #     derechos: solo-agregado    # trae correos: sale el agregado, no el dato
 #     rutas: ["cache/**"]
 #   credencial-delegada:
-#     clase: cloud-ok            # puede vivir en el entorno de una agente cloud...
-#     derechos: no-sale          # ...pero no se imprime, ni se pega, ni se deriva
-#     rutas: [".env.local"]
-#     # SOLO si cumple las dos: daño maximo pequeño y acotado (un proxy de solo
-#     # lectura, un bot que avisa) y rotable en minutos. Una clave que gasta,
-#     # despliega o escribe es local-only siempre. Caso real: convoca, 01-08-2026.
+#     clase: cloud-ok            # puede USARSE desde un arnes cloud aprobado...
+#     derechos: no-sale          # ...y no se imprime, ni se pega, ni se deriva
+#     rutas: ["(variable de entorno del arnes, no un fichero del repo)"]
+#     # cloud-ok NO significa "puede vivir en el repo": significa que ese arnes puede
+#     # usarla. Si acaba en un fichero del arbol, esta mal clasificada.
+#     #
+#     # SOLO si cumple LAS TRES:
+#     #  1. Dano maximo pequeno y acotado: un proxy de solo lectura, un bot que avisa.
+#     #     Una clave que gasta, despliega o escribe es local-only SIEMPRE.
+#     #  2. ROTADA AL MENOS UNA VEZ, con el procedimiento escrito. No "rotable": una
+#     #     rotacion que nunca has ejecutado no es una rotacion, igual que una guarda
+#     #     que no has visto caer no es una guarda.
+#     #  3. ACUNADA PARA ESE ENTORNO, propia y revocable por separado. Nunca copia de
+#     #     una que comparten personas u otros sistemas: los entornos cloud no suelen
+#     #     tener boveda, y quien usa el entorno puede leer sus valores.
+#     #
+#     # Y antes de las tres, la pregunta que ahorra el caso entero: ?tiene que existir
+#     # ahi esa credencial? Muchos arneses inyectan las suyas por proxy y entonces no
+#     # se guarda ninguna. Caso real: convoca, 01-08-2026.
 data_map: {}
 
 # OPCIONAL Y VACIO POR DEFECTO. Relay funciona entero sin grafo de conocimiento:
