@@ -139,6 +139,19 @@ CASOS = [
 ]
 
 
+def es_repo_de_relay() -> bool:
+    """True solo dentro del repositorio del metodo, no en un proyecto que lo adopta.
+
+    Se mira el CHANGELOG: el de Relay declara versiones de Relay. Un anfitrion o no
+    tiene, o tiene el suyo (y ese fue justo el falso rojo que 0.6.1 corrigio).
+    """
+    ch = RAIZ / "CHANGELOG.md"
+    if not ch.exists():
+        return False
+    cabeza = ch.read_text(encoding="utf-8")[:2000]
+    return "Mycelia Relay" in cabeza or "mycelia-relay" in cabeza
+
+
 def main() -> int:
     if not VALIDADOR.exists():
         print(f"No encuentro el validador en {VALIDADOR}")
@@ -155,19 +168,31 @@ def main() -> int:
                   f"obtuve codigo {codigo} y:")
             print("      " + salida.strip().replace("\n", "\n      "))
 
-    # La plantilla de este repositorio tiene que seguir EN ROJO: es una plantilla, no
+    # La plantilla de ESTE repositorio tiene que seguir EN ROJO: es una plantilla, no
     # una configuracion. Si algun dia alguien la "arregla" rellenandola, los equipos
     # se llevarian un data_map de mentira que valida. Esto lo caza.
-    plantilla = RAIZ / ".relay.yml"
-    p = subprocess.run([sys.executable, str(VALIDADOR), str(plantilla)],
-                       capture_output=True, text=True, cwd=RAIZ)
-    ok = p.returncode == 1 and "data_map vacio" in (p.stdout + p.stderr)
-    print(f"{'ok  ' if ok else 'FALLA'} | la plantilla de este repo sigue en rojo a proposito")
-    if not ok:
-        fallos += 1
-        print("      el .relay.yml de Relay es una plantilla y debe fallar con el mapa vacio")
+    #
+    # SOLO APLICA EN EL REPO DE RELAY. En un anfitrion, `RAIZ/.relay.yml` es la CONFIG
+    # REAL del proyecto y esta legitimamente llena: alli este caso falla siempre, y un
+    # rojo permanente se deja de leer -- la regla del propio Relay. Es la misma clase
+    # de defecto que la guarda del CHANGELOG corregida en 0.6.1: escrita desde el punto
+    # de vista del repo del metodo, rota en un anfitrion. La encontro datapoble al ser
+    # el primer anfitrion que corrio este fichero.
+    total = len(CASOS)
+    if es_repo_de_relay():
+        plantilla = RAIZ / ".relay.yml"
+        p = subprocess.run([sys.executable, str(VALIDADOR), str(plantilla)],
+                           capture_output=True, text=True, cwd=RAIZ)
+        ok = p.returncode == 1 and "data_map vacio" in (p.stdout + p.stderr)
+        print(f"{'ok  ' if ok else 'FALLA'} | la plantilla de este repo sigue en rojo a proposito")
+        if not ok:
+            fallos += 1
+            print("      el .relay.yml de Relay es una plantilla y debe fallar con el mapa vacio")
+        total += 1
+    else:
+        print("skip | plantilla en rojo: solo aplica en el repo de Relay, no en un anfitrion")
 
-    total = len(CASOS) + 1
+    total = total
     print(f"\n{total - fallos}/{total} guardas comprobadas.")
     if fallos:
         print("Hay guardas que no hacen lo que dicen.")
