@@ -1,5 +1,41 @@
 # Changelog · Mycelia Relay
 
+## 0.6 · 2026-08-02
+
+Cinco enmiendas de **datapoble** (observatorio de datos territoriales, 947 municipios), el primer equipo que llega **desde otro marco y con equipo ya montado** — dos meses de Cambium Charter, una coordinadora y cinco frentes. Su carta y el caso entero están en [`docs/casos/datapoble-desde-cambium.md`](docs/casos/datapoble-desde-cambium.md). Van con tres ajustes de la custodia, todos sacados de su propia evidencia.
+
+**El encargo se contrasta, y la corrección se registra.** En una sola sesión, tres encargos escritos por la coordinadora llevaban una premisa falsa; las tres las cazó el agente que las ejecutaba y ninguna llegó a producción. La tercera enseña el mecanismo: obedecer al pie de la letra habría escrito «sobre 3.915.127 habitantes» bajo un porcentaje de *viviendas* — una procedencia falsa, bien maquetada. Y funciona al revés: una casilla de estado que decía «hecho» de algo que nadie hizo estuvo doce días.
+
+El contrato ya tenía **media** regla: el paso 3 mandaba verificar el *estado de partida* contra el repositorio. Los tres casos no son estado de partida, son premisas sobre cómo funciona el sistema, así que la regla se generaliza en vez de añadirse: se contrasta **qué está hecho** y **cómo funciona el sistema**, y lo que difiera corrige el issue antes de trabajar. El campo nuevo del PR es el registro de esa corrección, porque contradecir hacia arriba tiene un coste social que un formulario elimina.
+
+*Ajuste de la custodia:* la casilla propuesta —«el encargo era correcto en todo lo que pude comprobar»— se puede marcar sin haber comprobado nada, y eso fabrica una garantía falsa: exactamente la peor cicatriz de Relay (`data_map` vacío dando verde). Ahora afirma **lo que hiciste**, no lo que salió, y hay una tercera opción para declarar que no pudiste contrastarlo, igual que en «no comprobado y motivo».
+
+**Derecho nuevo: `no-publicar`.** Material legítimamente versionado que una decisión editorial mantiene fuera del producto. El caso: una capa electoral que **está en un repositorio público** —así que `no-sale` es factualmente falso, ya salió— y que la dirección decidió no servir ni derivar. Ninguno de los cuatro derechos lo decía, y la señal de que el vocabulario estaba corto es la de siempre: **hubo que escribir un valor falso y anotarlo como tensión**, el mismo síntoma que trajo el cambio de 0.5 desde otro equipo.
+
+Se distingue de `no-reproducir`, que se le parece: aquél es **autoría** (no copias el contenido a ningún sitio, y no cambia nunca), éste es **decisión editorial** (procésalo con libertad, no llega al producto, y puede revertirlo quien la tomó). Y solo es exigible si el producto está identificado: quien lo use dice en su `REGLAS.md` dónde acaba —web, API, chat, allow-list de consultas—, porque un derecho que no nombra su frontera no se puede cumplir ni comprobar.
+
+*Tensión conocida, declarada y no resuelta:* datapoble diagnostica que los derechos mezclan **dos ejes** —qué puedo hacer con el fichero y qué puede publicar el producto— y el diagnóstico es correcto y más grande que el parche. La respuesta limpia sería un tercer eje. No se hace: pesa en cada material de cada proyecto para servir un caso que aún no existe. **Disparador para reabrirlo: el día que un material necesite dos derechos a la vez.**
+
+**La membrana se cruza también por consecuencia.** La lista de escalados nombra actos —publicar, desplegar, enviar, gastar—, todos verbos de intención. Lo que pasó fue otra cosa: un agente en una tarea de tablero encontró un almacén electoral desactualizado; reconstruirlo era mecánicamente parte de su trabajo y **habría publicado datos electorales de 947 municipios como efecto lateral**. Se paró y lo escaló. No le paró la lista: le paró reconocer la consecuencia.
+
+Esto le importa a Relay más de lo que la propuesta reclama. Las jurisdicciones rígidas de Cambium cazaban efectos laterales **por estructura** —no podías tocar lo que no era tuyo—; Relay las quitó por ligereza y no puso nada en su lugar para esa clase de captura. Ahora la pregunta es *qué queda publicado, desplegado o gastado cuando esto entre*, no solo qué dice la tarea que hace.
+
+*Ajuste de la custodia:* llegó como comentario en `.relay.yml` y redactada como «antes de integrar». Pero su propio caso muestra al agente parándose **con el trabajo a medias**, y un comentario de configuración se lee una vez, el día de la instalación. Sube al contrato, a *Durante el trabajo* y a la lista de escalados; en `.relay.yml` queda un puntero.
+
+**La ejecución de la propia adopción no escala.** Instalar Relay toca checks y reglas duras —dos entradas de la lista que esa misma instalación trae—, así que un equipo literal se bloquea pidiendo permiso para instalar el permiso. Queda dicho: la adopción viene autorizada por quien la encarga. Con el matiz que aporta el caso y que es la parte que importa: **la transcripción de las reglas duras sí escala**, y va en su propio PR, porque en datapoble la coordinadora transcribió las reglas de seguridad de su propia dirección sin que nadie las revisara. Salieron bien; el método no debería depender de eso.
+
+**Una guarda que no has visto caer no es una guarda.** Llega presentada como «un quinto, más pequeño, por si sirve», y en la historia de Relay es la regla que habría cazado nuestro peor defecto. A datapoble el patrón «existe un verificador y no lo ejecuta nadie» les mordió **cinco veces**, una ocultando que dos almacenes servían números distintos para la misma métrica del mismo municipio en 917 de 947 casos.
+
+Entra en el PR template (si el PR añade una comprobación, ¿la has visto caer?), entra en el contrato, y **Relay se la aplica a sí mismo**: `scripts/test_validate_config.py` inyecta cada fallo y comprueba que el validador cae *por el motivo correcto*, con un caso que fija `no-publicar` como regresión y otro que exige que la plantilla de este repositorio siga en rojo. Corre en CI. Hasta hoy no teníamos ninguna prueba de que nuestra guarda cayera: el fallo de 0.5 se encontró **leyendo el código**, no porque el validador fallara.
+
+**Y tres defectos propios que la carta destapó sin buscarlos**, todos de la misma familia — el cambio llega a la doctrina y no al artefacto que los equipos copian:
+
+- `AGENTS.relay.md` seguía pidiendo «impacto sobre Mycelia» en el cierre: 0.5 limpió las plantillas y se dejó el contrato. **Tercera vez** con este mismo fallo.
+- `docs/adopcion-ejemplo.md` era **anterior a 0.4** entero: se titulaba «Adopción de Mycelia y Mycelia Relay» y su «configuración recomendada» era el bloque `mycelia:` que borramos en 0.4.1. Un equipo que adoptara leyéndolo escribía una configuración que el validador no conoce. Reescrito como [`docs/adopcion.md`](docs/adopcion.md). **Cuarta vez.**
+- **La plantilla de issue podía ocultar un derecho**, y `no-publicar` lo habría empeorado. Pedía «la clase más restrictiva… sus derechos van con ella», pero la clase más restrictiva **no arrastra** los derechos más restrictivos: una tarea que toque `local-only` + `libre` y `repository` + `no-publicar` declara `local-only`, y `no-publicar` no aparecería en ninguna parte del contrato que la agente lee. Ahora se declara material a material.
+
+Y uno menor: la lista de instalación **nunca incluyó `scripts/validate_config.py`**, y dos párrafos después el README te decía que lo ejecutaras. Dos equipos lo copiaron igual, por sentido común. Que funcionara por sentido común no lo hacía correcto.
+
 ## 0.5 · 2026-07-31
 
 Cuatro cambios de la **segunda auditoría de Clara**, hecha ya con 0.4.1 instalado y funcionando. El primero es el más grave que ha tenido Relay.

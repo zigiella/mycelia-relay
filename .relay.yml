@@ -1,4 +1,4 @@
-version: 0.5
+version: 0.6
 
 project:
   tracker: github-issues
@@ -29,16 +29,13 @@ checks:
   # El par del proyecto integra lo rutinario; lo de abajo escala a la direccion.
   merge_authority: project-par
   escalate_to_direction:
+    # ...por intencion Y POR CONSECUENCIA: una tarea rutinaria que publica
+    # como efecto lateral tambien cruza. Ver AGENTS.relay.md, "Durante el trabajo".
     - membrana          # publicar, desplegar, enviar, gastar
     - reglas-duras      # reglas del proyecto y doctrina
     - checks-y-permisos # CI, validadores, proteccion de ramas, secretos
     - cambio-masivo     # barre medio repositorio
     - duda              # ante la duda se pregunta, siempre
-  # La membrana se cruza tambien POR CONSECUENCIA: una tarea cuyo proposito es rutinario
-  # puede cruzarla por efecto lateral. Antes de integrar, preguntate no solo que estas
-  # haciendo, sino que queda publicado, desplegado o gastado cuando esto entre.
-  # (Caso datapoble: refrescar un almacen habria publicado datos electorales de 947
-  # municipios como efecto lateral de una tarea de tablero.)
   # relay-check solo mira los PR que cruzan entornos o cambian de manos; un aviso
   # que salta siempre se deja de leer.
   only_cross_environment: true
@@ -63,9 +60,16 @@ data_rights:
   libre: "Sin restriccion de derivacion"
   solo-agregado: "Sale agregado o anonimizado, nunca el dato individual"
   no-reproducir: "Se puede leer y usar; no copiar ni reproducir su contenido"
-  # Propuesta datapoble: material legitimamente versionado que una decision editorial
-  # mantiene fuera del producto. `no-sale` no sirve (ya salio: esta en el repo) y
-  # `solo-agregado` tampoco (no sale ni agregado). Caso: capa electoral.
+  # OJO, se parece a no-reproducir y no es lo mismo. no-reproducir es AUTORIA: no
+  # copias el contenido a ningun sitio, y eso no cambia nunca. no-publicar es una
+  # DECISION EDITORIAL: procesalo con libertad, simplemente no llega al producto, y
+  # puede revertirlo quien la tomo. Sirve para material legitimamente versionado que
+  # se mantiene fuera de lo que se sirve; `no-sale` seria falso (ya salio: esta en el
+  # repo) y `solo-agregado` tambien (no sale ni agregado).
+  # Si lo usas, di DONDE ACABA TU PRODUCTO --web, API, chat, allow-list de consultas--
+  # en el REGLAS.md del proyecto: un derecho que no nombra su frontera no se puede
+  # cumplir ni comprobar. (Caso datapoble: capa electoral en repo publico, fuera del
+  # web, del chat y del allow-list de SQL.)
   no-publicar: "Se puede leer y procesar; no sale al producto"
   no-sale: "Ni se copia, ni se imprime, ni se deriva"
 
