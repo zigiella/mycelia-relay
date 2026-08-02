@@ -34,6 +34,11 @@ checks:
     - checks-y-permisos # CI, validadores, proteccion de ramas, secretos
     - cambio-masivo     # barre medio repositorio
     - duda              # ante la duda se pregunta, siempre
+  # La membrana se cruza tambien POR CONSECUENCIA: una tarea cuyo proposito es rutinario
+  # puede cruzarla por efecto lateral. Antes de integrar, preguntate no solo que estas
+  # haciendo, sino que queda publicado, desplegado o gastado cuando esto entre.
+  # (Caso datapoble: refrescar un almacen habria publicado datos electorales de 947
+  # municipios como efecto lateral de una tarea de tablero.)
   # relay-check solo mira los PR que cruzan entornos o cambian de manos; un aviso
   # que salta siempre se deja de leer.
   only_cross_environment: true
@@ -58,6 +63,10 @@ data_rights:
   libre: "Sin restriccion de derivacion"
   solo-agregado: "Sale agregado o anonimizado, nunca el dato individual"
   no-reproducir: "Se puede leer y usar; no copiar ni reproducir su contenido"
+  # Propuesta datapoble: material legitimamente versionado que una decision editorial
+  # mantiene fuera del producto. `no-sale` no sirve (ya salio: esta en el repo) y
+  # `solo-agregado` tampoco (no sale ni agregado). Caso: capa electoral.
+  no-publicar: "Se puede leer y procesar; no sale al producto"
   no-sale: "Ni se copia, ni se imprime, ni se deriva"
 
 # EL MAPA. Vacio no vale: mientras lo este, nadie sabe que puede ver una agente
