@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 CLASES = {"repository", "cloud-ok", "local-only", "synthetic-only"}
-DERECHOS = {"libre", "solo-agregado", "no-reproducir", "no-sale"}
+DERECHOS = {"libre", "solo-agregado", "no-reproducir", "no-publicar", "no-sale"}
 
 
 def main() -> int:
