@@ -1,5 +1,13 @@
 # Changelog · Mycelia Relay
 
+## 0.6.1 · 2026-08-02
+
+**La guarda de versión era nuestra y el rojo iba a ser suyo.** La comprobación que 0.5 añadió —que `.relay.yml` y el CHANGELOG digan la misma versión— no miraba **de quién** era el CHANGELOG. En cualquier repositorio anfitrión con su propio `CHANGELOG.md` en la raíz, que son casi todos, comparaba la versión de Relay contra la del proyecto y fallaba: `version del fichero (0.6) distinta de la ultima del CHANGELOG (2.3.1)`. Un rojo por algo que no es un fallo, en el primer comando que ejecuta un equipo al adoptar. Ahora solo se dispara si el CHANGELOG es de Relay.
+
+Los dos equipos que han adoptado hasta hoy vieron verde por casualidad: ninguno tenía `CHANGELOG.md` en la raíz.
+
+Encontrado **escribiendo las instrucciones de migración a 0.6 para otro equipo**, no ejecutando nada. La lección va con la enmienda 5 de datapoble y la completa: una guarda se prueba en negativo, y además **se prueba en el sitio donde va a correr**. Las trece guardas del validador se probaban contra configuraciones sueltas en un directorio temporal — es decir, contra el repositorio de Relay, nunca contra un anfitrión. Caso nuevo en la suite: un `CHANGELOG.md` de proyecto no dispara la guarda.
+
 ## 0.6 · 2026-08-02
 
 Cinco enmiendas de **datapoble** (observatorio de datos territoriales, 947 municipios), el primer equipo que llega **desde otro marco y con equipo ya montado** — dos meses de Cambium Charter, una coordinadora y cinco frentes. Su carta y el caso entero están en [`docs/casos/datapoble-desde-cambium.md`](docs/casos/datapoble-desde-cambium.md). Van con tres ajustes de la custodia, todos sacados de su propia evidencia.
