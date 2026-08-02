@@ -23,6 +23,8 @@ issue -> rama -> PR   <------------>   local / cloud
 
 ## Instalación en un proyecto, en dos pasos
 
+Guía completa en [`docs/adopcion.md`](docs/adopcion.md). Y antes de empezar: **instalar Relay toca checks y reglas duras por definición, así que la ejecución de la adopción no escala** — viene autorizada por quien la encarga. Lo que sí escala es la transcripción de las reglas duras del proyecto, que la revisa quien las escribió.
+
 El orden importa: las plantillas de issue y las etiquetas **solo surten efecto desde la rama por defecto**. Si todo el andamiaje entra por un PR que espera revisión humana, la primera tarea bajo Relay se ejecuta sin la mitad de lo que Relay promete.
 
 **Paso 1 · bootstrap (andamiaje, directo a la rama por defecto).** Ficheros y etiquetas. Casi inerte, con una excepción honesta: `relay-check` empieza a correr en los PR. Por eso desde 0.4 **solo mira los que llevan etiqueta de cruce de entornos** (`relevo`, `working-cloud`, `paused-local`); en el resto sale de puntillas. Un aviso que salta en todos los PR se deja de leer, y el día que importa nadie lo mira.
@@ -31,6 +33,7 @@ El orden importa: las plantillas de issue y las etiquetas **solo surten efecto d
 .github/ISSUE_TEMPLATE/agent-task.yml
 .github/pull_request_template.md
 .github/workflows/relay-check.yml
+scripts/validate_config.py
 ```
 
 Y las etiquetas de estado, una vez:
@@ -76,9 +79,12 @@ Y los **derechos** dicen qué se puede hacer con él, **con independencia de la 
 - `libre`: sin restricción de derivación.
 - `solo-agregado`: sale agregado o anonimizado, nunca el dato individual.
 - `no-reproducir`: se puede leer y usar; no copiar ni reproducir su contenido.
+- `no-publicar`: se puede leer y procesar; no sale al producto.
 - `no-sale`: ni se copia, ni se imprime, ni se deriva.
 
-**Son dos ejes independientes, y ese es el punto.** Un material puede vivir legítimamente en el repositorio y ser obra ajena que se lee pero no se reproduce: `repository` + `no-reproducir`. Los derechos viajan con el dato, no con su ubicación. Y una regla que ahorra un error caro: **lo que el proyecto publica deliberadamente no es `local-only`**; lo protegido suele ser la materia prima, no el producto.
+**Son dos ejes independientes, y ese es el punto.** Un material puede vivir legítimamente en el repositorio y ser obra ajena que se lee pero no se reproduce: `repository` + `no-reproducir`. Los derechos viajan con el dato, no con su ubicación. Y de ahí se sigue una consecuencia que hay que decir en voz alta: **la clase más restrictiva no arrastra los derechos más restrictivos**, así que se miran material por material y no por el peor de una sola columna.
+
+Dos reglas que ahorran errores caros. **Lo que el proyecto publica deliberadamente no es `local-only`**: lo protegido suele ser la materia prima, no el producto — para el producto que se guarda pero no se sirve está `no-publicar`. Y **un derecho que no nombra su frontera no se puede cumplir**: si usas `no-publicar`, di en el `REGLAS.md` del proyecto dónde acaba tu producto (web, API, chat, allow-list de consultas).
 
 Todo esto se declara en `data_map`, material a material, **con sus rutas**: una etiqueta sin ficheros no le dice a una agente cloud a qué te refieres. Y `data_map` vacío **no valida**: mientras lo esté, Relay no está protegiendo nada y `validate_config` lo dice en rojo.
 
@@ -87,6 +93,8 @@ Todo esto se declara en `data_map`, material a material, **con sus rutas**: una 
 `scripts/validate_config.py` comprueba que el proyecto **ha declarado sus materiales**: `data_map` con clase, derechos y rutas de cada uno. Falla si está vacío, si un valor no es del vocabulario o si una entrada no apunta a ficheros; avisa si una ruta no existe hoy. Un verde aquí significa que alguien ha pensado qué puede ver la nube, no que la plantilla siga entera.
 
 `.github/workflows/relay-check.yml` comprueba en cada PR de cruce lo que se puede comprobar sin humano: que enlaza un issue, que la evidencia no está vacía y que la política de datos está declarada. Avisa por defecto; se endurece a fallo cuando el equipo lo quiera.
+
+Y **las guardas se prueban en negativo**: `scripts/test_validate_config.py` inyecta cada fallo y comprueba que el validador cae *por el motivo correcto*, incluido que la plantilla de este repositorio siga en rojo con su `data_map` vacío. Corre en CI ([`tests.yml`](.github/workflows/tests.yml)) y es de Relay, no del andamiaje que se instala. Existe por una razón concreta: hasta 0.5 nuestro validador daba verde con el mapa vacío y **nadie lo había visto fallar nunca**; se descubrió leyendo el código. Una guarda que no has visto caer no es una guarda.
 
 Lo que no se puede automatizar —que la evidencia sea *cierta*, que la clasificación sea *correcta*— sigue siendo criterio humano. Estas herramientas evitan el olvido; no sustituyen el juicio.
 
@@ -102,4 +110,4 @@ Relay mantiene el relevo. El proyecto produce. El conocimiento compartido, si ha
 
 ## Versión
 
-`0.5` (2026-07-31). Cambios y su origen en [`CHANGELOG.md`](CHANGELOG.md). **Ninguna regla de Relay nació de una intuición**: todas salieron de fricción medida en equipos reales — un piloto de relevo local↔cloud y dos auditorías de un equipo que llegó sin marco previo.
+`0.6` (2026-08-02). Cambios y su origen en [`CHANGELOG.md`](CHANGELOG.md). **Ninguna regla de Relay nació de una intuición**: todas salieron de fricción medida en equipos reales — un piloto de relevo local↔cloud, dos auditorías de un equipo que llegó sin marco previo y la adopción de un equipo que llegó desde otro marco con equipo ya montado.

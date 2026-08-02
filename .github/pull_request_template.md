@@ -16,15 +16,16 @@ Closes #
 - Comprobaciones ejecutadas:
 - Resultados:
 - No comprobado y motivo:
-- Si este PR **anade** una comprobacion, la has visto caer? (probada en negativo):
+- Si este PR **añade** una comprobación, ¿la has visto caer? (probada en negativo):
 
 ## El encargo, contrastado
 
-*Vacio es una respuesta legitima. El campo existe para que corregir a quien asigno deje de ser un
-acto de valentia y pase a ser rellenar una casilla.*
+*El campo existe para que corregir a quien te asignó deje de ser un acto de valentía y pase a ser
+rellenar una casilla. Marca lo que hiciste, no lo que salió.*
 
-- [ ] El encargo era correcto en todo lo que pude comprobar.
-- [ ] Encontre esto de falso o impreciso, y esto hice con ello:
+- [ ] Contrasté las premisas del encargo contra el repositorio: no encontré nada falso.
+- [ ] Encontré esto de falso o impreciso, y esto hice con ello:
+- [ ] No pude contrastarlo (por qué):
 
 ## Política de datos
 

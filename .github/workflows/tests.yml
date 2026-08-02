@@ -1,0 +1,29 @@
+name: Tests
+
+# CI del PROPIO Relay, no parte del andamiaje que se instala en un proyecto. Un equipo
+# que adopta Relay copia .github/ISSUE_TEMPLATE/, pull_request_template.md, relay-check.yml
+# y scripts/validate_config.py; este fichero se queda aqui.
+#
+# Existe por la regla de datapoble: una guarda que no has visto caer no es una guarda.
+# Hasta 0.5 nuestro validador daba verde con el data_map vacio y nadie lo habia visto
+# fallar nunca. Ahora cada guarda se prueba en negativo en cada push.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  guardas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: Cada guarda del validador, vista caer
+        run: python scripts/test_validate_config.py
