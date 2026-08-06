@@ -96,30 +96,89 @@ Esto es **el comportamiento correcto**, tal y como avisa el enunciado de esta ta
 
 Esto es la parte que de verdad mide algo: ¿qué rama acepta este entorno cloud en la práctica, frente a lo que pide `branch_pattern`?
 
+Nota sobre un error propio, corregido en vivo: el commit del Paso 3 se hizo primero estando en `main` local (por descuido, al no haber creado antes la rama). No llegó a empujarse nunca a `origin/main` — se detectó antes del push. Se corrigió así: `git branch agent/000-diagnostico-rutina` (para no perder el commit), luego `git checkout main && git reset --hard origin/main` para devolver el `main` local a su estado remoto. `main` remoto nunca estuvo en riesgo real, pero queda declarado porque es información honesta sobre el proceso.
+
 ### 3a. Intento contra `agent/000-diagnostico-rutina` (el patrón que impone `.relay.yml`)
 
-Comandos y salida completa, sin resumir:
+Comando y salida completa, sin resumir:
 
-<!-- RELLENAR EN VIVO: comando y salida exacta de 3a -->
+```
+$ git checkout agent/000-diagnostico-rutina
+$ git push -u origin agent/000-diagnostico-rutina
+remote:
+remote: Create a pull request for 'agent/000-diagnostico-rutina' on GitHub by visiting:
+remote:      https://github.com/zigiella/mycelia-relay/pull/new/agent/000-diagnostico-rutina
+remote:
+To https://github.com/zigiella/mycelia-relay
+ * [new branch]      agent/000-diagnostico-rutina -> agent/000-diagnostico-rutina
+branch 'agent/000-diagnostico-rutina' set up to track 'origin/agent/000-diagnostico-rutina'.
+EXIT:0
+```
 
-### 3b / 3c. Según el resultado de 3a
+**3a FUNCIONÓ.** El push a la rama que respeta `branch_pattern` fue aceptado sin ningún rechazo, sin pedir PR previo, sin bloqueo de ningún tipo.
 
-<!-- RELLENAR EN VIVO -->
+### 3c. Confirmación con `claude/diagnostico-rutina` (namespace propio del arnés)
+
+Como 3a funcionó, toca (según el enunciado) confirmar que la otra vía también funciona:
+
+```
+$ git checkout -b claude/diagnostico-rutina
+Switched to a new branch 'claude/diagnostico-rutina'
+$ git push -u origin claude/diagnostico-rutina
+remote:
+remote: Create a pull request for 'claude/diagnostico-rutina' on GitHub by visiting:
+remote:      https://github.com/zigiella/mycelia-relay/pull/new/claude/diagnostico-rutina
+remote:
+To https://github.com/zigiella/mycelia-relay
+ * [new branch]      claude/diagnostico-rutina -> claude/diagnostico-rutina
+branch 'claude/diagnostico-rutina' set up to track 'origin/claude/diagnostico-rutina'.
+EXIT:0
+```
+
+**3c también FUNCIONÓ.** Las dos ramas se aceptaron igual: `agent/000-diagnostico-rutina` (con el patrón `agent/{issue}-{slug}`) y `claude/diagnostico-rutina` (namespace propio del arnés, sin seguir el patrón). No hubo ninguna diferencia de trato entre las dos.
+
+### Hallazgo del experimento
+
+Se revisó `.github/workflows/` (lectura, sin tocar nada) para ver si algo aplica `branch_pattern` como regla técnica en vez de convención. Hay dos workflows: `tests.yml` y `relay-check.yml`. `relay-check.yml` solo se dispara en eventos de `pull_request` (no en push a rama) y, dentro de eso, solo actúa si el PR lleva una etiqueta de cruce (`relevo`, `working-cloud`, `paused-local`); comprueba enlace a issue, sección Evidencia, clase de datos y bloque de relevo/pendientes en el cuerpo del PR — nada sobre el nombre de la rama. No existe ninguna protección de rama ni workflow que rechace un push por no cumplir `branch_pattern`.
+
+Conclusión: `branch_pattern` en `.relay.yml` es, en este repositorio, **una preferencia documentada, no una barrera técnica**. Esto coincide exactamente con lo que dice el propio comentario de `.relay.yml` ("Preferencia, no ley: si el arnés de la agente impone su propio espacio de nombres, usa el suyo y declara la rama real en el HANDOFF") y con `AGENTS.relay.md` punto 5 ("Si tu arnés impone su propio espacio de nombres y no puedes cumplir el patrón, usa el suyo y declara la rama real en el relevo"). El experimento confirma en la práctica lo que el contrato ya admitía por escrito: ambas vías funcionan, y el patrón es orientativo.
 
 ---
 
 ## PASO 4 — Entrega durable
 
-<!-- RELLENAR EN VIVO -->
+Antes de intentar el PR, se completó este informe (Pasos 1–3 arriba) en el fichero `docs/casos/diagnostico-rutina.md` y se empujó a **ambas** ramas aceptadas: `agent/000-diagnostico-rutina` y `claude/diagnostico-rutina`. La entrega no depende de que `gh pr create` funcione.
+
+Intento de apertura de PR con `gh`:
+
+```
+$ which gh || echo "SIN gh"
+SIN gh
+```
+
+`gh` no está instalado en este entorno cloud. No se pudo ejecutar `gh pr create`. Esto se dice literalmente aquí: **no se intentó ni se simuló ningún resultado de `gh pr create`**, porque el binario no existe. La entrega durable de esta rutina es el fichero empujado en rama, no un PR.
+
+Se dispone de herramientas MCP de GitHub (`mcp__github__*`) en este arnés, que sí permiten crear un PR sin pasar por el binario `gh`. El enunciado pedía específicamente `gh pr create` y decía "si gh no existe o el comando falla, dilo literalmente en el fichero y no pasa nada". Se sigue esa instrucción al pie de la letra: se declara la ausencia de `gh` y no se sustituye por otra vía no pedida, para no ampliar el alcance de la tarea sin decirlo. (Ampliar el alcance se declara, no se cuela — `AGENTS.relay.md`.) Si la dirección quiere que además se abra el PR por otra vía, es una decisión suya, no de esta rutina.
 
 ---
 
 ## COMPROBADO CON
 
-<!-- RELLENAR AL CIERRE -->
+- `git remote -v`, `git status -sb`, `git log --oneline -3`, `git config user.name`, `git config user.email` — ejecutados de verdad, salida arriba.
+- `python --version`, `python -c "import yaml; print('pyyaml ok')"`, `which gh` — ejecutados de verdad, salida arriba.
+- Lectura completa de `AGENTS.relay.md` y `.relay.yml` — leídos de verdad, `branch_pattern` extraído literalmente del fichero.
+- `python scripts/test_validate_config.py` — ejecutado de verdad, 14/14, salida arriba.
+- `python scripts/validate_config.py` — ejecutado de verdad, falla con `data_map vacio` tal y como el propio repositorio dice que debe fallar. No se tocó `.relay.yml`.
+- `git push -u origin agent/000-diagnostico-rutina` — ejecutado de verdad, aceptado.
+- `git push -u origin claude/diagnostico-rutina` — ejecutado de verdad, aceptado.
+- Lectura de `.github/workflows/relay-check.yml` y listado de `.github/workflows/` — leídos de verdad, sin modificar nada, para comprobar si `branch_pattern` se aplica técnicamente en algún sitio. No se aplica.
+- `git branch`, `git checkout`, `git reset --hard origin/main` — ejecutados de verdad para corregir el commit hecho por error en `main` local, antes de cualquier push a `origin/main`.
 
 ## NO COMPROBADO
 
-<!-- RELLENAR AL CIERRE -->
+- `gh pr create` (y por tanto la apertura real del PR): no se pudo ejecutar porque `gh` no está instalado en este entorno (`which gh` → `SIN gh`). No se simuló ningún resultado de este comando.
+- No se comprobó si existe protección de rama configurada en GitHub (branch protection rules) desde el lado de administración del repositorio: esta rutina no tiene acceso a esa configuración vía git ni vía los comandos pedidos en el enunciado. Lo que sí se comprobó es el resultado empírico (el push se aceptó) y la ausencia de un workflow que lo bloquee.
+- No se comprobó qué pasaría si `relay-check.yml` se disparase sobre un PR real de estas ramas (por ejemplo si detectaría o avisaría de algo), porque no se abrió PR. Solo se leyó su condición de disparo.
+- No se comprobó el comportamiento de las herramientas MCP de GitHub (`mcp__github__create_pull_request` u otras) para abrir el PR por una vía distinta a `gh`, porque el enunciado pedía específicamente `gh pr create` y no autorizaba ampliar el alcance sin decirlo primero.
 
 Firma: Rutina <rutina@mycelia.local>
