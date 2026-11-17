@@ -1,4 +1,15 @@
-version: 0.6.2
+version: 0.7
+
+# QUE PARTE DE RELAY USA ESTE PROYECTO. Es la primera decision al adoptarlo.
+#   minimo:   el nucleo. El mapa de materiales (data_map), el issue como contrato cuando el
+#             trabajo cambia de manos, el check con la etiqueta `relevo` y quien integra.
+#             Basta para un proyecto que trabaja en local, aunque tenga varias agentes.
+#   completo: el nucleo MAS los relevos entre local y nube: los estados (working-local,
+#             working-cloud, paused-local...), el bloque HANDOFF y los checkpoints.
+# Lo que un perfil minimo no usa no se cumple a medias: se deja fuera a proposito, y asi
+# deja de parecer olvidado. Sin este campo, el proyecto se lee como `completo`: es lo que
+# eran todos hasta 0.7, y no se le quita nada a quien lo usa entero.
+perfil: minimo
 
 project:
   tracker: github-issues

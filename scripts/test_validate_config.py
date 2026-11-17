@@ -144,6 +144,19 @@ CASOS = [
         "un .relay.yml que no es YAML cae diciendolo",
         dict(config="version: [0.6\nproject: {"), 1, "YAML",
     ),
+    (
+        # Desde 0.7. Un perfil mal escrito no puede leerse como "completo" en silencio.
+        "un perfil fuera del vocabulario cae",
+        dict(config=BASE.replace("version: 0.6\n", "version: 0.6\nperfil: ligero\n")), 1, "perfil='ligero'",
+    ),
+    (
+        "perfil minimo es valido, y el validador dice cual ha leido",
+        dict(config=BASE.replace("version: 0.6\n", "version: 0.6\nperfil: minimo\n")), 0, "perfil minimo",
+    ),
+    (
+        "sin perfil se lee como completo: no se le quita nada a quien ya usaba Relay entero",
+        dict(config=BASE), 0, "perfil completo",
+    ),
 ]
 
 
@@ -196,11 +209,18 @@ def main() -> int:
         plantilla = RAIZ / ".relay.yml"
         p = subprocess.run([sys.executable, str(VALIDADOR), str(plantilla)],
                            capture_output=True, text=True, cwd=RAIZ)
-        ok = p.returncode == 1 and "data_map vacio" in (p.stdout + p.stderr)
-        print(f"{'ok  ' if ok else 'FALLA'} | la plantilla de este repo sigue en rojo a proposito")
+        salida = p.stdout + p.stderr
+        # En rojo POR EL MAPA VACIO Y SOLO POR ESO. Hasta 0.7 este caso solo miraba que el
+        # rojo incluyera el mapa vacio, y un segundo motivo pasaba desapercibido: al preparar
+        # 0.7, `.relay.yml` dijo 0.7 con el CHANGELOG aun en 0.6.2, y este caso dio verde.
+        motivos = salida.count("\n  - ")
+        ok = p.returncode == 1 and "data_map vacio" in salida and motivos == 1
+        print(f"{'ok  ' if ok else 'FALLA'} | la plantilla de este repo sigue en rojo a proposito, "
+              "y solo por el mapa vacio")
         if not ok:
             fallos += 1
-            print("      el .relay.yml de Relay es una plantilla y debe fallar con el mapa vacio")
+            print("      el .relay.yml de Relay es una plantilla y debe fallar SOLO por el mapa vacio:")
+            print("      " + salida.strip().replace("\n", "\n      "))
         total += 1
     else:
         print("skip | plantilla en rojo: solo aplica en el repo de Relay, no en un anfitrion")

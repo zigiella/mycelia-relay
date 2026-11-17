@@ -18,6 +18,8 @@ from pathlib import Path
 
 CLASES = {"repository", "cloud-ok", "local-only", "synthetic-only"}
 DERECHOS = {"libre", "solo-agregado", "no-reproducir", "no-publicar", "no-sale"}
+# Desde 0.7. Sin el campo, `completo`: es lo que eran todos los proyectos hasta entonces.
+PERFILES = {"minimo", "completo"}
 
 
 def es_changelog_de_relay(texto: str) -> bool:
@@ -85,6 +87,12 @@ def main() -> int:
     if not cfg.get("project", {}).get("tracker"):
         fallos.append("project.tracker sin declarar: no se sabe donde viven las tareas")
 
+    # Que parte del contrato aplica. Un perfil mal escrito no puede leerse como "completo"
+    # en silencio: diria a las agentes que cumplan lo que el proyecto quiso dejar fuera.
+    perfil = cfg.get("perfil", "completo")
+    if perfil not in PERFILES:
+        fallos.append(f"perfil='{perfil}': desconocido. Validos: {', '.join(sorted(PERFILES))}")
+
     # El corazon: el mapa de materiales. Vacio = nadie ha declarado nada.
     mapa = cfg.get("data_map") or {}
     if not mapa:
@@ -124,8 +132,8 @@ def main() -> int:
         return 1
 
     n = len(mapa)
-    print(f"Configuracion Relay valida: {n} material{'es' if n != 1 else ''} declarado{'s' if n != 1 else ''}"
-          + (f", {len(avisos)} aviso(s)" if avisos else ""))
+    print(f"Configuracion Relay valida (perfil {perfil}): {n} material{'es' if n != 1 else ''} "
+          f"declarado{'s' if n != 1 else ''}" + (f", {len(avisos)} aviso(s)" if avisos else ""))
     return 0
 
 

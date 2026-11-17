@@ -1,47 +1,35 @@
+<!--
+  Mycelia Relay. El check lee estos cuatro apartados por su encabezado: escribe debajo
+  de cada uno. Lo que va entre estas marcas es guía y no cuenta, y una línea que es solo
+  una etiqueta («- Comprobado con:») tampoco. Lo demás —qué cambia, por qué—, escríbelo
+  como quieras, encima o debajo.
+-->
+
 ## Issue
 
-Closes #
-
-## Propietaria y entorno
-
-- Agente/arnés:
-- Entorno: local | cloud | híbrido
-- Rama:
-
-## Qué cambia
-
+<!-- «Closes #N» cuando el criterio de aceptación se cumple entero. Si el trabajo sigue
+     vivo, «Seguimiento: #N», sin Closes. -->
 
 ## Evidencia
 
-- Comprobaciones ejecutadas:
-- Resultados:
+- Comprobado con:
 - No comprobado y motivo:
-- Si este PR **añade** una comprobación, ¿la has visto caer? (probada en negativo):
+- Premisas del encargo:
+- Premisa de mi arreglo:
 
-## El encargo, contrastado
+<!-- Comprobado con: el comando y su salida, o la revisión que hiciste.
+     Premisas del encargo: «contrastadas contra el repositorio, nada falso», «esto era falso,
+     y esto hice con ello», o «no pude contrastarlas, porque…». Marca lo que hiciste, no lo
+     que salió.
+     Premisa de mi arreglo, si arreglas algo: el diagnóstico, contrastado con el log antes
+     de escribirlo. Un arreglo bueno con una explicación falsa deja escrito un error.
+     Si este PR añade una comprobación: ¿la has visto caer? -->
 
-*El campo existe para que corregir a quien te asignó deje de ser un acto de valentía y pase a ser
-rellenar una casilla. Marca lo que hiciste, no lo que salió.*
+## Clase de datos
 
-- [ ] Contrasté las premisas del encargo contra el repositorio: no encontré nada falso.
-- [ ] Encontré esto de falso o impreciso, y esto hice con ello:
-- [ ] No pude contrastarlo (por qué):
+<!-- De data_map en .relay.yml: cada material que toca este PR, con su clase y sus derechos. -->
 
-## Política de datos
+## Pendientes
 
-- Material tocado (nombre en `data_map`):
-- Clase y derechos: repository | cloud-ok | local-only | synthetic-only · libre | solo-agregado | no-reproducir | no-publicar | no-sale
-- Confirmo que respeté los derechos del material: no salió nada que no debiera salir [ ]
-
-## Conocimiento reusable
-
-- [ ] Nada que sobreviva a esta tarea.
-- [ ] Deja una lección o decisión que merece sobrevivir (dónde queda escrita): 
-
-## Handoff o pendientes
-
-
-## Revisión humana
-
-- [ ] El cambio hacia fuera, irreversible o costoso ha sido aprobado.
-- [ ] El PR está listo para integrar.
+<!-- «Ninguno», o lo que queda. Si la tarea cambia de manos entre local y nube, el bloque
+     HANDOFF de AGENTS.relay.md. -->

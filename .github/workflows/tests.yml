@@ -14,11 +14,11 @@ name: Tests
 #
 # Si copias este workflow, copia tambien el script: sin el, la CI queda en rojo.
 #
-# Desde 0.7, solo corre cuando cambia lo que prueba (filtro `paths`). Hasta 0.6.2 corria
-# en cada push: en convoca, 299 ejecuciones en 17 dias para 3 cambios de lo que prueba, en
-# un repositorio privado que ya se habia quedado sin minutos una vez. El validador solo
-# puede fallar por `.relay.yml` o por su propio codigo, asi que no hay nada mas que vigilar.
-# Arreglo de Trazo en convoca (PR #353), medido por Clara.
+# Desde 0.7, solo corre cuando cambia lo que prueba (filtro `paths`): el validador y su
+# configuracion, el check y la plantilla que el check lee. Hasta 0.6.2 corria en cada push:
+# en convoca, 299 ejecuciones en 17 dias para 3 cambios de lo que prueba, en un repositorio
+# privado que ya se habia quedado sin minutos una vez. Arreglo de Trazo en convoca (PR #353),
+# medido por Clara.
 
 on:
   push:
@@ -28,12 +28,18 @@ on:
       - "scripts/validate_config.py"
       - "scripts/test_validate_config.py"
       - ".github/workflows/tests.yml"
+      - ".github/workflows/relay-check.yml"
+      - ".github/pull_request_template.md"
+      - "scripts/test_relay_check.py"
   pull_request:
     paths:
       - ".relay.yml"
       - "scripts/validate_config.py"
       - "scripts/test_validate_config.py"
       - ".github/workflows/tests.yml"
+      - ".github/workflows/relay-check.yml"
+      - ".github/pull_request_template.md"
+      - "scripts/test_relay_check.py"
 
 # Un commit nuevo a la misma rama o PR cancela el run anterior que siga en curso.
 concurrency:
@@ -54,3 +60,8 @@ jobs:
       - run: pip install pyyaml
       - name: Cada guarda del validador, vista caer
         run: python scripts/test_validate_config.py
+      # Desde 0.7 el check tambien tiene pruebas. Hasta entonces no tenia ninguna, y por eso
+      # dos defectos vivieron meses: STRICT=0 tumbaba el job, y la ultima linea de Evidencia
+      # se perdia. Y la plantilla sin rellenar pasaba tres de las cuatro comprobaciones.
+      - name: El check, visto caer
+        run: python scripts/test_relay_check.py

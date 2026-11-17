@@ -52,20 +52,67 @@ jobs:
           avisos=0
           aviso() { echo "::warning::$1"; avisos=$((avisos+1)); }
 
-          # 1. Enlaza un issue (Closes #N, Issue: #N o una referencia #N cualquiera)
-          echo "$BODY" | grep -Eqi '#[0-9]+' || aviso "El PR no enlaza ningun issue: en Relay el issue es el contrato."
+          # El check lee los CUATRO apartados de la plantilla por su encabezado, y mira su
+          # CONTENIDO. Hasta 0.6.2 buscaba palabras sueltas por todo el cuerpo, y la plantilla
+          # SIN RELLENAR pasaba tres de las cuatro comprobaciones: sus etiquetas vacias de
+          # Evidencia contaban como contenido, traia escritas las clases de datos, y su
+          # encabezado "Handoff o pendientes" ya contenia la palabra buscada. Validaba el
+          # andamiaje, no el PR: la misma cicatriz que el data_map vacio de 0.5.
+          #
+          # Lo que va entre <!-- y --> es guia de la plantilla y no cuenta, y una linea que es
+          # solo una etiqueta ("- Comprobado con:") tampoco. Cada apartado se lee hasta el
+          # encabezado siguiente O HASTA EL FINAL: hasta 0.6.2, si Evidencia era el ultimo,
+          # se perdia su ultima linea y un PR de una linea avisaba en falso.
+          sin_comentarios() {
+            printf '%s\n' "$BODY" | tr -d '\r' | awk '
+              { linea = $0; limpia = ""
+                while (linea != "") {
+                  if (encom) {
+                    p = index(linea, "-->")
+                    if (p == 0) linea = ""; else { linea = substr(linea, p + 3); encom = 0 }
+                  } else {
+                    p = index(linea, "<!--")
+                    if (p == 0) { limpia = limpia linea; linea = "" }
+                    else { limpia = limpia substr(linea, 1, p - 1); linea = substr(linea, p + 4); encom = 1 }
+                  }
+                }
+                print limpia }'
+          }
+          seccion() {      # contenido de los apartados cuyo encabezado casa con $1
+            sin_comentarios | awk -v pat="$1" '
+              /^[ \t]*#+[ \t]/ { dentro = (tolower($0) ~ pat); next }
+              dentro && $0 !~ /^[ \t]*([-*][ \t]+)?[^:]+:[ \t]*$/ { print }'
+          }
+          hay_seccion() {
+            sin_comentarios | awk -v pat="$1" '/^[ \t]*#+[ \t]/ && tolower($0) ~ pat { f = 1 } END { exit !f }'
+          }
+          fuera_de_encabezados() { sin_comentarios | grep -v '^[[:space:]]*#' || true; }
 
-          # 2. Evidencia declarada, no seccion vacia
-          EV=$(echo "$BODY" | sed -n '/^#\+ *Evidencia/,/^#\+ /p' | sed '1d;$d' | tr -d '[:space:]')
+          # 1. Enlaza un issue: un #N en cualquier parte (Closes #N, "Seguimiento: #N"...).
+          sin_comentarios | grep -Eq '#[0-9]+' \
+            || aviso "El PR no enlaza ningun issue: en Relay el issue es el contrato."
+
+          # 2. Evidencia, con contenido de verdad.
+          EV=$(seccion 'evidencia' | tr -d '[:space:]')
           [ -n "$EV" ] || aviso "La seccion Evidencia esta vacia: declara que comprobaste y que no."
 
-          # 3. Clase de datos declarada
-          echo "$BODY" | grep -Eqi 'repository|cloud-ok|local-only|synthetic-only' \
+          # 3. Clase de datos, dentro de su apartado ("Clase de datos"; "Politica de datos" en
+          #    plantillas anteriores a 0.7). Sin apartado, en cualquier linea que no sea encabezado.
+          #    El MENU de opciones ("repository | cloud-ok | ...") que traian la plantilla de
+          #    0.6.2 y el bloque HANDOFF sin rellenar no es una respuesta: no cuenta.
+          if hay_seccion 'de datos'; then CL=$(seccion 'de datos'); else CL=$(fuera_de_encabezados); fi
+          printf '%s\n' "$CL" | grep -Eiv 'repository *\| *cloud-ok' \
+            | grep -Eqi 'repository|cloud-ok|local-only|synthetic-only' \
             || aviso "No se declara la clase de datos utilizada."
 
-          # 4. Relevo o pendientes: que quede dicho si la tarea sigue viva
-          echo "$BODY" | grep -Eqi 'handoff|pendiente' \
-            || aviso "Sin bloque de relevo ni pendientes: si la tarea continua, la siguiente agente no sabra por donde."
+          # 4. Pendientes o relevo, con contenido ("Pendientes"; "Handoff o pendientes" antes de
+          #    0.7). Sin apartado, la palabra en una linea que no sea encabezado.
+          if hay_seccion 'pendiente|handoff'; then
+            PE=$(seccion 'pendiente|handoff' | tr -d '[:space:]')
+          else
+            PE=$(fuera_de_encabezados | grep -Ei 'handoff|pendiente' || true)
+          fi
+          [ -n "$PE" ] || aviso "Sin pendientes ni relevo: si la tarea continua, la siguiente agente no sabra por donde."
 
           if [ "$avisos" -gt 0 ]; then
             echo "$avisos aviso(s) de contrato Relay."
