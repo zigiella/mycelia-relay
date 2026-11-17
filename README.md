@@ -51,7 +51,11 @@ AGENTS.relay.md
 
 No sustituyas el `AGENTS.md` del proyecto. Añade en él una referencia a `AGENTS.relay.md` y deja que las reglas específicas del proyecto tengan prioridad.
 
-## Estados
+**Y decide el perfil, en `.relay.yml`.** `perfil: minimo` es el núcleo: el mapa de materiales, el issue como contrato cuando el trabajo cambia de manos, el check con `relevo` y quién integra. Basta para un proyecto que trabaja en local, aunque tenga varias agentes. `perfil: completo` añade los relevos entre local y nube: los estados, el bloque `HANDOFF` y los checkpoints. Lo que un perfil mínimo no usa no se cumple a medias, se deja fuera a propósito. Sin el campo, el proyecto se lee como `completo`, que es lo que eran todos hasta 0.7.
+
+## Estados · perfil completo
+
+Solo con `perfil: completo`. Un proyecto con perfil mínimo no los usa, y no pasa nada.
 
 - `ready`: tarea definida y reclamable.
 - `working-local`: agente de escritorio activo.
@@ -92,9 +96,9 @@ Todo esto se declara en `data_map`, material a material, **con sus rutas**: una 
 
 `scripts/validate_config.py` comprueba que el proyecto **ha declarado sus materiales**: `data_map` con clase, derechos y rutas de cada uno. Falla si está vacío, si un valor no es del vocabulario o si una entrada no apunta a ficheros; avisa si una ruta no existe hoy. Un verde aquí significa que alguien ha pensado qué puede ver la nube, no que la plantilla siga entera.
 
-`.github/workflows/relay-check.yml` comprueba en cada PR de cruce lo que se puede comprobar sin humano: que enlaza un issue, que la evidencia no está vacía y que la política de datos está declarada. Avisa por defecto; se endurece a fallo cuando el equipo lo quiera.
+`.github/workflows/relay-check.yml` comprueba **cuatro cosas** en cada PR que lleva la etiqueta `relevo` (o `working-cloud`, `paused-local`), y solo en esos: que **enlaza un issue**, que la **Evidencia** tiene contenido, que declara la **clase de datos** y que dice qué queda **pendiente**. Lee los cuatro apartados de la plantilla por su encabezado y mira su contenido: la guía de la plantilla, entre `<!--` y `-->`, no cuenta, y una línea que es solo una etiqueta tampoco. Hasta 0.6.2 buscaba palabras sueltas por todo el cuerpo, y la plantilla **sin rellenar** pasaba tres de las cuatro. Un PR sin esas etiquetas sale `skipped` y no gasta minutos. Avisa por defecto; se endurece a fallo cuando el equipo lo quiera.
 
-Y **las guardas se prueban en negativo**: `scripts/test_validate_config.py` inyecta cada fallo y comprueba que el validador cae *por el motivo correcto*, incluido que la plantilla de este repositorio siga en rojo con su `data_map` vacío. Corre en CI ([`tests.yml`](.github/workflows/tests.yml)) y es de Relay, no del andamiaje que se instala. Existe por una razón concreta: hasta 0.5 nuestro validador daba verde con el mapa vacío y **nadie lo había visto fallar nunca**; se descubrió leyendo el código. Una guarda que no has visto caer no es una guarda.
+Y **las guardas se prueban en negativo**: `scripts/test_validate_config.py` inyecta cada fallo y comprueba que el validador cae *por el motivo correcto*, incluido que la plantilla de este repositorio siga en rojo **y solo** por su `data_map` vacío; y desde 0.7, `scripts/test_relay_check.py` hace lo mismo con el check, sacando su script del propio workflow. Corren en CI ([`tests.yml`](.github/workflows/tests.yml)), solo cuando cambia lo que prueban. Existe por una razón concreta: hasta 0.5 nuestro validador daba verde con el mapa vacío y **nadie lo había visto fallar nunca**; se descubrió leyendo el código. Una guarda que no has visto caer no es una guarda.
 
 Lo que no se puede automatizar —que la evidencia sea *cierta*, que la clasificación sea *correcta*— sigue siendo criterio humano. Estas herramientas evitan el olvido; no sustituyen el juicio.
 
@@ -110,4 +114,4 @@ Relay mantiene el relevo. El proyecto produce. El conocimiento compartido, si ha
 
 ## Versión
 
-`0.6.2` (2026-08-02). Cambios y su origen en [`CHANGELOG.md`](CHANGELOG.md). **Ninguna regla de Relay nació de una intuición**: todas salieron de fricción medida en equipos reales — un piloto de relevo local↔cloud, dos auditorías de un equipo que llegó sin marco previo y la adopción de un equipo que llegó desde otro marco con equipo ya montado.
+`0.7` (2026-11-17). Cambios y su origen en [`CHANGELOG.md`](CHANGELOG.md). **Ninguna regla de Relay nació de una intuición**: todas salieron de fricción medida en equipos reales — un piloto de relevo local↔cloud, dos auditorías de un equipo que llegó sin marco previo, la adopción de un equipo que llegó desde otro marco con equipo ya montado, y el uso diario de convoca desde agosto, medido por quien lo usaba.

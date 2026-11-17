@@ -2,6 +2,15 @@
 
 Estas reglas complementan el `AGENTS.md` del proyecto. Ante conflicto, mandan las reglas específicas del proyecto y las decisiones explícitas de la dirección.
 
+## Mínimo o completo
+
+Relay tiene un **núcleo** que vale para todo proyecto, y una parte para los **relevos entre local y nube**. Cada proyecto declara en `.relay.yml` cuál usa: `perfil: minimo` o `perfil: completo`. Sin declararlo, `completo`.
+
+- **Núcleo, para todo proyecto:** el mapa de materiales (`data_map`), el issue como contrato cuando el trabajo cambia de manos, el check con la etiqueta `relevo` y quién integra. Es todo este contrato hasta «Cierre».
+- **Perfil completo, además:** los estados (`working-local`, `working-cloud`, `paused-local`…), el bloque `HANDOFF` y los checkpoints. Es la sección del final, marcada **[perfil completo]**.
+
+Con `perfil: minimo`, lo marcado como completo **no aplica**: no se cumple a medias, se deja fuera a propósito. Así lo que un proyecto no usa deja de parecer olvidado. Un proyecto que trabaja en local, aunque tenga varias agentes, no necesita más que el núcleo.
+
 ## Antes de trabajar
 
 1. Abre el issue asignado.
@@ -10,9 +19,9 @@ Estas reglas complementan el `AGENTS.md` del proyecto. Ante conflicto, mandan la
    - **Qué está hecho ya.** Una tarea puede estar hecha en parte: es lo normal al instalar Relay sobre un proyecto en marcha. Si el issue declara cobertura previa, compruébala en el código antes de escribir. Rehacer trabajo existente, o sustituirlo por otra versión creyendo que partías de cero, es el fallo más caro de esta fase.
    - **Cómo funciona el sistema.** «El ingestor ya trae el año», «esos recuentos sí se publican», «esta métrica se expresa sobre habitantes». Quien te asigna escribe de memoria, y de memoria se equivoca sin querer y con total seguridad en el tono.
 
-   Si algo difiere, **corrige el issue antes de trabajar, no después**, y dilo en la entrega. Contradecir a quien te asignó no es insubordinación: es la parte del trabajo que solo puede hacer quien tiene el código delante. Obedecer al pie de la letra una premisa falsa no produce un error visible, produce **un resultado bien acabado y falso**, que es peor. Y funciona en las dos direcciones: una casilla de estado que dice «hecho» de algo que nadie hizo también es un encargo falso.
+   Si algo difiere, **corrige el issue antes de trabajar, no después**, y dilo en la entrega: en la Evidencia del PR, «Premisas del encargo». Contradecir a quien te asignó no es insubordinación: es la parte del trabajo que solo puede hacer quien tiene el código delante. Obedecer al pie de la letra una premisa falsa no produce un error visible, produce **un resultado bien acabado y falso**, que es peor. Y funciona en las dos direcciones: una casilla de estado que dice «hecho» de algo que nadie hizo también es un encargo falso.
 4. Confirma que no existe otra escritora activa sobre la misma tarea o rama.
-5. Crea o recupera la rama que fije `.relay.yml`. Si tu arnés impone su propio espacio de nombres y no puedes cumplir el patrón, usa el suyo y **declara la rama real en el relevo**: el patrón existe para que la rama se encuentre, no es una ley que justifique no entregar.
+5. Crea o recupera la rama que fije `.relay.yml`. Si tu arnés impone su propio espacio de nombres y no puedes cumplir el patrón, usa el suyo y **declara la rama real en la entrega**: el patrón existe para que la rama se encuentre, no es una ley que justifique no entregar.
 6. Si el proyecto usa un grafo de conocimiento, lee **solo** las notas enlazadas desde el issue. Si no lo usa, tus reglas duras y clases de datos viven en el `REGLAS.md` de este repositorio: Relay no necesita grafo.
 
 **El issue es el contrato cuando el trabajo cruza entornos o cambia de manos.** Ahí una instrucción de chat no reflejada en el issue todavía no cambia nada: una agente cloud no oye el chat, y el issue es la única superficie que las dos partes leen. Si una sola agente hace la tarea entera en un entorno, la dirección manda por su canal y el issue se abre cuando hay algo que relevar o algo que recordar.
@@ -21,10 +30,10 @@ Estas reglas complementan el `AGENTS.md` del proyecto. Ante conflicto, mandan la
 
 - Mantén una sola tarea activa por agente salvo partición expresa.
 - Haz cambios pequeños, reversibles y comprobables.
-- No toques rutas fuera del alcance sin ampliar el issue o dejar un handoff.
-- Publica checkpoints cuando el trabajo pueda perderse o continuar en otro entorno.
-- No escribas secretos, credenciales, rutas locales ni datos `local-only`. Y antes de derivar algo de un material, mira sus **derechos** en `data_map`, no solo su clase.
+- No toques rutas fuera del alcance sin ampliar el issue o dejarlo dicho en la entrega.
+- No escribas secretos, credenciales, rutas locales ni datos `local-only`, ni pidas que se suban para desbloquearte. Y antes de derivar algo de un material, mira sus **derechos** en `data_map`, no solo su clase.
 - Declara las comprobaciones reales. Un check no ejecutado se marca como no ejecutado.
+- **Contrasta también la premisa de tu arreglo.** Antes de escribir por qué algo fallaba, compruébalo en el log o en la salida. Un arreglo correcto con un diagnóstico falso deja escrita una explicación que la siguiente agente va a creer: en convoca llegó un arreglo bueno explicado como «jq lee vacío el cuerpo del PR», cuando el cuerpo era «-». Es la hermana de contrastar el encargo, y se declara en el mismo sitio: la Evidencia del PR, «Premisa de mi arreglo».
 - **Clase y derechos son dos ejes, y los derechos viajan con el dato.** La clase dice **dónde** puede estar (`repository`, `cloud-ok`, `local-only`, `synthetic-only`); los derechos dicen **qué puedes hacer con él** (`libre`, `solo-agregado`, `no-reproducir`, `no-publicar`, `no-sale`), y valen igual aunque la clase no restrinja nada. Un material puede vivir legítimamente en el repositorio y ser obra ajena que se lee pero no se reproduce: eso es `repository` + `no-reproducir`, y si tu esquema no lo admite, el esquema está mal. Cada material, con sus rutas, está en `data_map` de `.relay.yml`.
 - **La clase más restrictiva no arrastra los derechos más restrictivos.** Son ejes independientes también al mirarlos: si tu tarea toca un material `local-only` + `libre` y otro `repository` + `no-publicar`, la clase que declaras es `local-only` y el derecho que te va a morder es `no-publicar`. Míralos material por material, no por el peor de una sola columna.
 - **Lo que el proyecto publica deliberadamente no es `local-only`.** Si algo ya está en la web o en un repositorio público, protegerlo como local es una ficción que obliga a despublicar para cumplirla. Lo protegido suele ser la materia prima, no el producto. Para eso está `no-publicar`: material que puede estar donde está y que una decisión editorial mantiene fuera de lo que se sirve.
@@ -32,7 +41,42 @@ Estas reglas complementan el `AGENTS.md` del proyecto. Ante conflicto, mandan la
 - **Una guarda que no has visto caer no es una guarda.** Si tu cambio añade una comprobación —un test, un validador, una regla de CI—, pruébala en negativo: inyecta el fallo y compruébala caer, con el mensaje correcto. Un verificador que nunca ha fallado no demuestra que el sistema esté bien; demuestra que nadie lo ha mirado, y mientras tanto tapa lo que debería enseñar.
 - **Ampliar el alcance se declara, no se cuela.** Si descubres que hace falta algo que el issue no pedía, hazlo si es reversible y dilo en la entrega como ampliación; nunca en silencio.
 
-## Cuando no puedes cumplir el entorno declarado
+## Propiedad
+
+Una tarea tiene una sola escritora activa. La nueva agente continúa en la misma rama cuando el trabajo es lineal, y abre otra cuando vaya a competir con una solución anterior.
+
+**Límite declarado:** si todas las agentes actúan bajo la misma cuenta de plataforma, la propiedad es **declarativa, no verificable**, y la firma del commit es el único rastro comprobable. Fírmate con identidad propia (`<Nombre> <nombre@<proyecto>.local>`) y no trates la asignación como prueba.
+
+## Quién integra
+
+**El par de cada proyecto integra el trabajo de su proyecto cuando el merge es rutinario.** No hace falta que lo pulse la dirección ni un tercero: quien conoce el terreno es quien mejor ve si el trabajo está listo, y esperar a otra persona serializa el trabajo sin comprar seguridad.
+
+**No es rutinario, y por tanto escala a la dirección:**
+
+- lo que cruza la membrana: publicar, desplegar, enviar, gastar — **y lo que la cruza por consecuencia**, aunque el propósito de la tarea fuera rutinario: mira qué queda publicado, desplegado o gastado cuando el PR entre, no solo qué dice que hace;
+- lo que cambia reglas duras del proyecto o doctrina;
+- **lo que toca las comprobaciones o los permisos** (CI, validadores, protección de ramas, secretos): quien controla los checks controla toda la verificación futura;
+- lo que barre medio repositorio de una vez.
+
+Y una regla que vale más que la lista, porque la lista nunca está completa: **ante la duda, pregunta.** Preguntar es gratis y no es un reproche; integrar con dudas sí tiene coste, y lo paga el que viene detrás.
+
+## Cierre
+
+El PR lleva los **cuatro apartados que lee el check** —issue, Evidencia, clase de datos y pendientes—, y lo demás se escribe como se quiera. La tarea termina al integrarse el PR o al cerrarse explícitamente el issue, no cuando una agente dice que ha acabado.
+
+**Un issue con trabajo vivo no se cierra.** `Closes #N` solo cuando el criterio de aceptación está completo: si tu PR cubre una parte y queda trabajo pendiente, entrega **sin** `Closes` y deja el issue abierto. Si te encuentras un issue **cerrado con trabajo vivo** (pasa cuando un merge parcial lo cerró), reábrelo; si no puedes, entrega sin `Closes`, enlaza el issue y dilo en la entrega. Que la plataforma lo marque cerrado no significa que el trabajo esté terminado.
+
+---
+
+## [perfil completo] Relevos entre local y nube
+
+Lo que sigue aplica con `perfil: completo`, cuando el trabajo salta entre una agente de escritorio y una en la nube. Con `perfil: minimo` no aplica.
+
+### Checkpoints
+
+Publica checkpoints cuando el trabajo pueda perderse o continuar en otro entorno. Si existen cambios locales sin push, la tarea no es recuperable por el equipo.
+
+### Cuando no puedes cumplir el entorno declarado
 
 Un issue puede declarar `hybrid` o `either` y tocarte solo una parte (eres local y hay un leg cloud que no puedes invocar, o al revés). Orden de preferencia:
 
@@ -40,11 +84,11 @@ Un issue puede declarar `hybrid` o `either` y tocarte solo una parte (eres local
 2. **Bloquea solo si tu parte no es separable** (`blocked`, con qué falta y quién puede desbloquear).
 3. **Nunca simules el otro entorno.** Un leg cloud fingido desde local, o un relevo imitado con un subagente del mismo arnés, produce evidencia falsa: mismo contexto, misma máquina, ninguna de las condiciones que el relevo quería probar. Vale más un hueco declarado que una prueba inventada.
 
-## Qué produce un leg para estar cumplido
+### Qué produce un leg para estar cumplido
 
 Un leg es la parte de una tarea que ejecuta un entorno. Está cumplido cuando existen las cuatro cosas: **artefacto** en la rama, **verificación ejecutada y declarada** (comando y salida real, o el motivo de no haberla ejecutado), **relevo publicado** con lo pendiente, y **entrega por PR**. Un leg que solo produce conversación no está cumplido, aunque el trabajo intelectual sea bueno.
 
-## Agente local
+### Agente local
 
 Antes de cerrar la aplicación o apagar el ordenador:
 
@@ -55,29 +99,22 @@ Antes de cerrar la aplicación o apagar el ordenador:
 5. deja el bloque `HANDOFF` en el issue o PR;
 6. cambia el estado a `paused-local` si la tarea no terminó.
 
-Si existen cambios locales sin push, la tarea no es recuperable por el equipo.
-
-## Agente cloud
+### Agente cloud
 
 - No asumas acceso a archivos locales, aplicaciones autenticadas o dispositivos.
-- No solicites que se suban datos `local-only` para desbloquearte.
 - Si la tarea depende de material local, deja el bloqueo y propone una partición segura.
 - Publica commits y PR aunque la sesión cloud prometa conservar memoria.
 
-## Propiedad y relevo
+### El relevo
 
-Una tarea tiene una sola escritora activa. El relevo exige:
+Cambiar de propietaria exige:
 
 - checkpoint publicado;
 - bloque `HANDOFF`;
 - cambio visible de propietaria;
 - confirmación de la nueva agente antes de escribir.
 
-La nueva agente continúa en la misma rama cuando el trabajo es lineal. Abre otra rama cuando vaya a competir con una solución anterior.
-
-**Límite declarado:** si todas las agentes actúan bajo la misma cuenta de plataforma, la propiedad es **declarativa, no verificable**, y la firma del commit es el único rastro comprobable. Fírmate con identidad propia (`<Nombre> <nombre@<proyecto>.local>`) y no trates la asignación como prueba.
-
-## Handoff
+### Handoff
 
 ```text
 HANDOFF
@@ -96,22 +133,3 @@ Siguiente propietaria: <agente o sin asignar>
 ```
 
 El par **Comprobado con / No comprobado** es lo que de verdad sostiene el relevo: el primero es reproducible, el segundo dice a la entrante dónde mirar. No los dejes vacíos.
-
-## Quién integra
-
-**El par de cada proyecto integra el trabajo de su proyecto cuando el merge es rutinario.** No hace falta que lo pulse la dirección ni un tercero: quien conoce el terreno es quien mejor ve si el trabajo está listo, y esperar a otra persona serializa el trabajo sin comprar seguridad.
-
-**No es rutinario, y por tanto escala a la dirección:**
-
-- lo que cruza la membrana: publicar, desplegar, enviar, gastar — **y lo que la cruza por consecuencia**, aunque el propósito de la tarea fuera rutinario: mira qué queda publicado, desplegado o gastado cuando el PR entre, no solo qué dice que hace;
-- lo que cambia reglas duras del proyecto o doctrina;
-- **lo que toca las comprobaciones o los permisos** (CI, validadores, protección de ramas, secretos): quien controla los checks controla toda la verificación futura;
-- lo que barre medio repositorio de una vez.
-
-Y una regla que vale más que la lista, porque la lista nunca está completa: **ante la duda, pregunta.** Preguntar es gratis y no es un reproche; integrar con dudas sí tiene coste, y lo paga el que viene detrás.
-
-## Cierre
-
-El PR incluye alcance, evidencia, limitaciones, conocimiento reusable y pendientes. La tarea termina al integrarse el PR o al cerrarse explícitamente el issue, no cuando una agente dice que ha acabado.
-
-**Un issue con relevo vivo no se cierra.** `Closes #N` solo cuando el criterio de aceptación está completo: si tu PR cubre una parte y el `HANDOFF` deja "Siguiente acción" sin ejecutar, entrega **sin** `Closes` y deja el issue abierto. Si te encuentras un issue **cerrado con relevo vivo** (pasa cuando un merge parcial lo cerró), reábrelo; si no puedes, entrega sin `Closes`, enlaza el issue y dilo en la entrega. Que la plataforma lo marque cerrado no significa que el trabajo esté terminado.

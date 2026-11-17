@@ -46,6 +46,13 @@ AGENTS.relay.md
 
 En el `AGENTS.md` del proyecto, una referencia a `AGENTS.relay.md` dejando claro que las reglas específicas del proyecto tienen prioridad. Y en el documento de arranque: **se arranca desde el issue asignado**, no desde una lectura fija de todo el paquete.
 
+**Decide el perfil** en `.relay.yml`, que es la primera elección y cambia qué parte del contrato aplica:
+
+- `perfil: minimo` — el núcleo: el mapa de materiales, el issue como contrato cuando el trabajo cambia de manos, el check con `relevo` y quién integra. Es lo que necesita un proyecto que trabaja en local, aunque tenga varias agentes hablándose en el mismo ordenador. La plantilla viene así.
+- `perfil: completo` — el núcleo más los relevos entre local y nube: los estados, el bloque `HANDOFF` y los checkpoints. Para cuando el trabajo salta de verdad entre una agente de escritorio y una en la nube.
+
+Lo que el perfil mínimo no usa se deja fuera a propósito, no a medias. Esto sale de convoca. Medido por Clara el 16-11-2026: cero PR con `working-cloud` o `paused-local` y ni un bloque `HANDOFF` en todo el repositorio, porque allí casi no hay relevos entre entornos. Lo que no se usaba no se distinguía de lo olvidado.
+
 ## Paso 3 · El mapa de materiales, que es el trabajo de verdad
 
 `data_map` llega vacío y **vacío no valida**: `validate_config.py` falla a propósito mientras lo esté. No es burocracia — mientras el mapa esté vacío nadie sabe qué puede ver una agente cloud, y Relay no está protegiendo nada aunque el fichero esté instalado.
