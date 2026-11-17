@@ -13,11 +13,32 @@ name: Tests
 # hace lo que dice. El caso que solo aplica aqui se declara "skip" en voz alta.
 #
 # Si copias este workflow, copia tambien el script: sin el, la CI queda en rojo.
+#
+# Desde 0.7, solo corre cuando cambia lo que prueba (filtro `paths`). Hasta 0.6.2 corria
+# en cada push: en convoca, 299 ejecuciones en 17 dias para 3 cambios de lo que prueba, en
+# un repositorio privado que ya se habia quedado sin minutos una vez. El validador solo
+# puede fallar por `.relay.yml` o por su propio codigo, asi que no hay nada mas que vigilar.
+# Arreglo de Trazo en convoca (PR #353), medido por Clara.
 
 on:
   push:
     branches: [main]
+    paths:
+      - ".relay.yml"
+      - "scripts/validate_config.py"
+      - "scripts/test_validate_config.py"
+      - ".github/workflows/tests.yml"
   pull_request:
+    paths:
+      - ".relay.yml"
+      - "scripts/validate_config.py"
+      - "scripts/test_validate_config.py"
+      - ".github/workflows/tests.yml"
+
+# Un commit nuevo a la misma rama o PR cancela el run anterior que siga en curso.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read

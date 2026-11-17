@@ -2,10 +2,26 @@ name: Relay check
 
 # Materializa los checks que .relay.yml declara y que se pueden comprobar sin humano.
 # Avisa por defecto; pon STRICT=1 (abajo) cuando el equipo quiera que bloquee.
+#
+# Desde 0.7 este fichero es el que corrio de verdad en convoca: los tres arreglos de
+# abajo los hizo Trazo alli (encargo #351, PR #353 de convoca, 2026-11-16) y Clara los
+# midio. Hasta 0.6.2 este check se habia ejecutado casi siempre "fuera de alcance", y
+# por eso sus defectos no se habian visto nunca.
+#
+# Si tu proyecto lleva una COPIA de este fichero anterior a 0.7, no tiene estos arreglos:
+# sustituyela entera, no la parchees.
 
 on:
   pull_request:
-    types: [opened, edited, reopened, synchronize, ready_for_review]
+    # `labeled`: si la etiqueta se pone DESPUES de abrir el PR, tambien lanza el check.
+    # Hasta 0.6.2 no estaba, y un PR etiquetado tarde no se comprobaba hasta el siguiente push.
+    types: [opened, edited, reopened, synchronize, ready_for_review, labeled]
+
+# Un commit nuevo al mismo PR cancela el run anterior que siga en curso: solo se comprueba
+# el ultimo, que lleva todo. Ahorra minutos sin perder cobertura.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -14,25 +30,25 @@ permissions:
 jobs:
   contrato:
     runs-on: ubuntu-latest
+    # Solo los PR que cruzan entornos o cambian de manos (por etiqueta), y no en borrador.
+    # Hasta 0.6.2 el filtro era un `case` DENTRO del script: el runner arrancaba y se cobraba
+    # el minuto entero aunque luego saliera "fuera de alcance". En convoca, 187 veces en 17
+    # dias. Con el `if:` a nivel de job, un PR sin estas etiquetas sale `skipped` sin arrancar
+    # nada, y un job saltado no se cobra.
+    if: >-
+      github.event.pull_request.draft == false &&
+      (contains(github.event.pull_request.labels.*.name, 'relevo') ||
+       contains(github.event.pull_request.labels.*.name, 'working-cloud') ||
+       contains(github.event.pull_request.labels.*.name, 'paused-local'))
     env:
       STRICT: "0"
     steps:
-      - uses: actions/checkout@v4
+      # Sin `actions/checkout`: el check solo lee el cuerpo del PR, que llega con el evento.
       - name: Comprueba el cuerpo del PR
+        # El cuerpo llega por env: queda como dato en $BODY y no se interpola en el script.
+        env:
+          BODY: ${{ github.event.pull_request.body }}
         run: |
-          BODY=$(jq -r '.pull_request.body // ""' "$GITHUB_EVENT_PATH")
-          DRAFT=$(jq -r '.pull_request.draft' "$GITHUB_EVENT_PATH")
-          LABELS=$(jq -r '[.pull_request.labels[].name] | join(",")' "$GITHUB_EVENT_PATH")
-          if [ "$DRAFT" = "true" ]; then echo "PR en borrador: no se comprueba todavia."; exit 0; fi
-
-          # Solo se comprueban los PR que cruzan entornos o cambian de manos: un
-          # aviso que salta en todos los PR se deja de leer, y el dia que importa
-          # nadie lo mira. Pon la etiqueta 'relevo' cuando la tarea cruce.
-          case ",$LABELS," in
-            *,relevo,*|*,working-cloud,*|*,paused-local,*) ;;
-            *) echo "PR sin cruce de entornos: fuera del alcance de relay-check."; exit 0 ;;
-          esac
-
           avisos=0
           aviso() { echo "::warning::$1"; avisos=$((avisos+1)); }
 
@@ -53,7 +69,11 @@ jobs:
 
           if [ "$avisos" -gt 0 ]; then
             echo "$avisos aviso(s) de contrato Relay."
-            [ "$STRICT" = "1" ] && exit 1
+            # STRICT=0 avisa y NO bloquea. Hasta 0.6.2 esta linea era `[ ... ] && exit 1`:
+            # con STRICT=0, la comprobacion devolvia 1, y como era la ultima orden del script,
+            # el job salia en rojo -- justo lo contrario de avisar. Nadie lo vio en este repo
+            # porque sus PR no tenian avisos; salio en la primera pasada real en convoca.
+            if [ "$STRICT" = "1" ]; then exit 1; fi
           else
             echo "Contrato Relay: PR completo."
           fi
